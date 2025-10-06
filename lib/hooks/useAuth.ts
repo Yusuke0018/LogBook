@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react';
 import {
   signInAnonymously,
+  signInWithPopup,
+  GoogleAuthProvider,
   onAuthStateChanged,
   User as FirebaseUser,
 } from 'firebase/auth';
@@ -26,14 +28,27 @@ export function useAuth() {
     return () => unsubscribe();
   }, []);
 
-  const signIn = async () => {
+  const signInWithGoogle = async () => {
+    if (!auth) {
+      throw new Error('Firebase Auth is not initialized');
+    }
+    try {
+      const provider = new GoogleAuthProvider();
+      await signInWithPopup(auth, provider);
+    } catch (error) {
+      console.error('Google認証エラー:', error);
+      throw error;
+    }
+  };
+
+  const signInAnonymous = async () => {
     if (!auth) {
       throw new Error('Firebase Auth is not initialized');
     }
     try {
       await signInAnonymously(auth);
     } catch (error) {
-      console.error('認証エラー:', error);
+      console.error('匿名認証エラー:', error);
       throw error;
     }
   };
@@ -53,7 +68,8 @@ export function useAuth() {
   return {
     user,
     loading,
-    signIn,
+    signInWithGoogle,
+    signInAnonymous,
     signOut,
   };
 }
