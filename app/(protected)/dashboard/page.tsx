@@ -29,6 +29,7 @@ import {
   ArrowDownTrayIcon,
   ArrowRightOnRectangleIcon,
 } from '@heroicons/react/24/outline';
+import ThemeToggle from '@/components/ThemeToggle';
 import type { Entry, EntryFormData } from '@/lib/types';
 
 export default function DashboardPage() {
@@ -153,13 +154,16 @@ export default function DashboardPage() {
                 LogBook
               </h1>
             </div>
-            <button
-              onClick={signOut}
-              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors rounded-lg hover:bg-gray-100/50 dark:hover:bg-gray-800/50"
-            >
-              <ArrowRightOnRectangleIcon className="h-5 w-5" />
-              ログアウト
-            </button>
+            <div className="flex items-center gap-2">
+              <ThemeToggle />
+              <button
+                onClick={signOut}
+                className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors rounded-lg hover:bg-gray-100/50 dark:hover:bg-gray-800/50"
+              >
+                <ArrowRightOnRectangleIcon className="h-5 w-5" />
+                ログアウト
+              </button>
+            </div>
           </div>
         </div>
       </header>
