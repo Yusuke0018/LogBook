@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/hooks/useAuth';
 import {
   createEntry,
+  updateEntry,
   deleteEntry,
   getEntriesByUser,
   getEntriesByDateRange,
@@ -40,6 +41,7 @@ export default function DashboardPage() {
     new Date()
   );
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+  const [editingEntry, setEditingEntry] = useState<Entry | null>(null);
   const [toast, setToast] = useState<{
     show: boolean;
     message: string;
@@ -91,11 +93,37 @@ export default function DashboardPage() {
     }
   };
 
+  const handleEditEntry = (entry: Entry) => {
+    setEditingEntry(entry);
+    // スクロールしてフォームに移動
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleUpdateEntry = async (data: EntryFormData) => {
+    if (!editingEntry) return;
+    try {
+      await updateEntry(editingEntry.id, data);
+      await loadEntries();
+      setEditingEntry(null);
+      showToast('投稿が更新されました');
+    } catch (error) {
+      console.error('更新エラー:', error);
+      showToast('投稿の更新に失敗しました', 'error');
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setEditingEntry(null);
+  };
+
   const handleDeleteEntry = async (entryId: string) => {
     if (!confirm('本当に削除しますか?')) return;
     try {
       await deleteEntry(entryId);
       await loadEntries();
+      if (editingEntry?.id === entryId) {
+        setEditingEntry(null);
+      }
       showToast('投稿が削除されました');
     } catch (error) {
       console.error('削除エラー:', error);
@@ -181,10 +209,15 @@ export default function DashboardPage() {
                   </svg>
                 </div>
                 <h2 className="text-2xl font-display font-bold text-gray-900 dark:text-white">
-                  新しい投稿
+                  {editingEntry ? '投稿を編集' : '新しい投稿'}
                 </h2>
               </div>
-              <EntryForm onSubmit={handleCreateEntry} />
+              <EntryForm
+                onSubmit={editingEntry ? handleUpdateEntry : handleCreateEntry}
+                initialData={editingEntry || undefined}
+                submitLabel={editingEntry ? '更新' : '投稿'}
+                onCancel={editingEntry ? handleCancelEdit : undefined}
+              />
             </div>
 
             {/* Entries List Card */}
@@ -229,6 +262,7 @@ export default function DashboardPage() {
               </div>
               <EntryList
                 entries={filteredEntries}
+                onEdit={handleEditEntry}
                 onDelete={handleDeleteEntry}
               />
             </div>

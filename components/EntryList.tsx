@@ -29,7 +29,7 @@ export default function EntryList({
       {entries.map((entry) => (
         <div
           key={entry.id}
-          className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 hover:shadow-md transition-shadow"
+          className="card p-6 hover:shadow-soft-lg transition-shadow"
         >
           <div className="flex justify-between items-start mb-3">
             <div className="flex-1">
@@ -44,11 +44,11 @@ export default function EntryList({
                 })}
               </p>
             </div>
-            <div className="flex space-x-2">
+            <div className="flex gap-2">
               {onEdit && (
                 <button
                   onClick={() => onEdit(entry)}
-                  className="p-2 text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                  className="p-2 text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded-lg transition-all"
                   title="編集"
                 >
                   <PencilIcon className="h-5 w-5" />
@@ -57,7 +57,7 @@ export default function EntryList({
               {onDelete && (
                 <button
                   onClick={() => onDelete(entry.id)}
-                  className="p-2 text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors"
+                  className="p-2 text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all"
                   title="削除"
                 >
                   <TrashIcon className="h-5 w-5" />
@@ -76,7 +76,7 @@ export default function EntryList({
                 {entry.tags.map((tag, index) => (
                   <span
                     key={index}
-                    className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
+                    className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-primary-100 text-primary-800 dark:bg-primary-900/30 dark:text-primary-200"
                   >
                     {tag}
                   </span>

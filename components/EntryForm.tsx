@@ -8,12 +8,14 @@ interface EntryFormProps {
   onSubmit: (data: EntryFormData) => Promise<void>;
   initialData?: Partial<EntryFormData>;
   submitLabel?: string;
+  onCancel?: () => void;
 }
 
 export default function EntryForm({
   onSubmit,
   initialData,
   submitLabel = '投稿',
+  onCancel,
 }: EntryFormProps) {
   const [title, setTitle] = useState(initialData?.title || '');
   const [content, setContent] = useState(initialData?.content || '');
@@ -39,11 +41,13 @@ export default function EntryForm({
 
       await onSubmit(data);
 
-      // フォームをリセット
-      setTitle('');
-      setContent('');
-      setTags('');
-      setWeather('');
+      // 編集モードでない場合のみフォームをリセット
+      if (!initialData) {
+        setTitle('');
+        setContent('');
+        setTags('');
+        setWeather('');
+      }
     } catch (error) {
       console.error('投稿エラー:', error);
     } finally {
@@ -124,11 +128,20 @@ export default function EntryForm({
         </div>
       </div>
 
-      <div className="flex justify-end pt-2">
+      <div className="flex justify-end gap-3 pt-2">
+        {onCancel && (
+          <button
+            type="button"
+            onClick={onCancel}
+            className="inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 rounded-button hover:bg-gray-200 dark:hover:bg-gray-700 transition-all"
+          >
+            キャンセル
+          </button>
+        )}
         <button
           type="submit"
           disabled={isSubmitting || !content.trim()}
-          className="inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold text-white gradient-primary rounded-xl shadow-soft hover:shadow-soft-lg transform hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+          className="inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold text-white bg-gradient-to-r from-primary-500 to-secondary-500 hover:from-primary-600 hover:to-secondary-600 rounded-button shadow-card hover:shadow-soft-lg transform hover:scale-[1.01] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
         >
           <PaperAirplaneIcon className="h-5 w-5" />
           {isSubmitting ? '送信中...' : submitLabel}
