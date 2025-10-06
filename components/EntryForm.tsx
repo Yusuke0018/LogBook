@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { PaperAirplaneIcon } from '@heroicons/react/24/solid';
 import type { EntryFormData } from '@/lib/types';
 
@@ -17,11 +17,26 @@ export default function EntryForm({
   submitLabel = '投稿',
   onCancel,
 }: EntryFormProps) {
-  const [title, setTitle] = useState(initialData?.title || '');
-  const [content, setContent] = useState(initialData?.content || '');
-  const [tags, setTags] = useState((initialData?.tags || []).join(', '));
-  const [weather, setWeather] = useState(initialData?.weather || '');
+  const [title, setTitle] = useState('');
+  const [content, setContent] = useState('');
+  const [tags, setTags] = useState('');
+  const [weather, setWeather] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // initialDataが変更されたときにフォームを更新
+  useEffect(() => {
+    if (initialData) {
+      setTitle(initialData.title || '');
+      setContent(initialData.content || '');
+      setTags((initialData.tags || []).join(', '));
+      setWeather(initialData.weather || '');
+    } else {
+      setTitle('');
+      setContent('');
+      setTags('');
+      setWeather('');
+    }
+  }, [initialData]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
