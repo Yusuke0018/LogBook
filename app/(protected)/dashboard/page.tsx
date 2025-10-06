@@ -8,6 +8,9 @@ import {
   getEntriesByUser,
   getEntriesByDateRange,
 } from '@/lib/services/entries';
+
+// Force dynamic rendering
+export const dynamic = 'force-dynamic';
 import {
   entriesToText,
   entriesToCSV,

@@ -4,6 +4,9 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/hooks/useAuth';
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic';
+
 export default function ProtectedLayout({
   children,
 }: {
