@@ -20,6 +20,10 @@ export async function createEntry(
   userId: string,
   data: EntryFormData
 ): Promise<string> {
+  if (!db) {
+    throw new Error('Firestore is not initialized');
+  }
+
   const now = Timestamp.now();
   const entryData = {
     userId,
@@ -39,6 +43,10 @@ export async function updateEntry(
   entryId: string,
   data: Partial<EntryFormData>
 ): Promise<void> {
+  if (!db) {
+    throw new Error('Firestore is not initialized');
+  }
+
   const entryRef = doc(db, COLLECTION_NAME, entryId);
   const updateData: Record<string, unknown> = {
     ...data,
@@ -49,11 +57,19 @@ export async function updateEntry(
 }
 
 export async function deleteEntry(entryId: string): Promise<void> {
+  if (!db) {
+    throw new Error('Firestore is not initialized');
+  }
+
   const entryRef = doc(db, COLLECTION_NAME, entryId);
   await deleteDoc(entryRef);
 }
 
 export async function getEntry(entryId: string): Promise<Entry | null> {
+  if (!db) {
+    throw new Error('Firestore is not initialized');
+  }
+
   const entryRef = doc(db, COLLECTION_NAME, entryId);
   const entrySnap = await getDoc(entryRef);
 
@@ -68,6 +84,10 @@ export async function getEntry(entryId: string): Promise<Entry | null> {
 }
 
 export async function getEntriesByUser(userId: string): Promise<Entry[]> {
+  if (!db) {
+    throw new Error('Firestore is not initialized');
+  }
+
   const q = query(
     collection(db, COLLECTION_NAME),
     where('userId', '==', userId),
@@ -86,6 +106,10 @@ export async function getEntriesByDateRange(
   startDate: Date,
   endDate: Date
 ): Promise<Entry[]> {
+  if (!db) {
+    throw new Error('Firestore is not initialized');
+  }
+
   const q = query(
     collection(db, COLLECTION_NAME),
     where('userId', '==', userId),

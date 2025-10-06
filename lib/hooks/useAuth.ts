@@ -13,6 +13,11 @@ export function useAuth() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!auth) {
+      setLoading(false);
+      return;
+    }
+
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setUser(user);
       setLoading(false);
@@ -22,6 +27,9 @@ export function useAuth() {
   }, []);
 
   const signIn = async () => {
+    if (!auth) {
+      throw new Error('Firebase Auth is not initialized');
+    }
     try {
       await signInAnonymously(auth);
     } catch (error) {
@@ -31,6 +39,9 @@ export function useAuth() {
   };
 
   const signOut = async () => {
+    if (!auth) {
+      throw new Error('Firebase Auth is not initialized');
+    }
     try {
       await auth.signOut();
     } catch (error) {
