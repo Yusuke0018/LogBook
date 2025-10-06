@@ -139,7 +139,7 @@ export default function DashboardPage() {
   const entryDates = entries.map((entry) => entry.createdAt.toDate());
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-primary-50/20 to-secondary-50/20 dark:from-gray-900 dark:to-gray-800">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Header with glassmorphism */}
       <header className="glass sticky top-0 z-10 border-b border-gray-200/50 dark:border-gray-700/50">
         <div className="container mx-auto px-4 py-4">
