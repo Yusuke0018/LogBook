@@ -1,0 +1,41 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- グラデーション背景 -->
+  <defs>
+    <linearGradient id="bg-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0ea5e9;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#d946ef;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#f97316;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="book-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#f0f9ff;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- 背景 -->
+  <rect width="512" height="512" rx="128" fill="url(#bg-gradient)"/>
+
+  <!-- 本のアイコン -->
+  <g transform="translate(128, 128)">
+    <!-- 本の背表紙 -->
+    <path d="M32 0 L64 16 L64 240 L32 256 Z" fill="#0ea5e9" opacity="0.8"/>
+
+    <!-- 本のページ（左） -->
+    <path d="M64 16 L128 16 L128 240 L64 240 Z" fill="url(#book-gradient)"/>
+
+    <!-- 本のページ（右） -->
+    <path d="M128 16 L192 16 L192 240 L128 240 Z" fill="url(#book-gradient)"/>
+
+    <!-- ページの線 -->
+    <line x1="80" y1="48" x2="112" y2="48" stroke="#0ea5e9" stroke-width="3" opacity="0.5"/>
+    <line x1="80" y1="80" x2="112" y2="80" stroke="#0ea5e9" stroke-width="3" opacity="0.5"/>
+    <line x1="80" y1="112" x2="112" y2="112" stroke="#0ea5e9" stroke-width="3" opacity="0.5"/>
+
+    <line x1="144" y1="48" x2="176" y2="48" stroke="#d946ef" stroke-width="3" opacity="0.5"/>
+    <line x1="144" y1="80" x2="176" y2="80" stroke="#d946ef" stroke-width="3" opacity="0.5"/>
+    <line x1="144" y1="112" x2="176" y2="112" stroke="#d946ef" stroke-width="3" opacity="0.5"/>
+
+    <!-- 本の影 -->
+    <ellipse cx="112" cy="250" rx="80" ry="10" fill="#000000" opacity="0.2"/>
+  </g>
+</svg>
