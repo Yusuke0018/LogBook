@@ -88,34 +88,33 @@ export default function Home() {
   ];
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-secondary-50 dark:bg-gray-900 relative overflow-hidden">
       {/* Background decoration */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary-100 dark:bg-primary-300 rounded-full mix-blend-multiply filter blur-xl opacity-30 dark:opacity-20 animate-pulse"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-secondary-100 dark:bg-secondary-300 rounded-full mix-blend-multiply filter blur-xl opacity-30 dark:opacity-20 animate-pulse" style={{ animationDelay: '2s' }}></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-accent-100 dark:bg-accent-300 rounded-full mix-blend-multiply filter blur-xl opacity-30 dark:opacity-20 animate-pulse" style={{ animationDelay: '4s' }}></div>
+        <div className="absolute -top-40 -right-40 w-96 h-96 bg-gradient-to-br from-primary-200 to-secondary-200 dark:from-primary-300 dark:to-secondary-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 dark:opacity-10 animate-pulse"></div>
+        <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-gradient-to-br from-secondary-200 to-accent-200 dark:from-secondary-300 dark:to-accent-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 dark:opacity-10 animate-pulse" style={{ animationDelay: '2s' }}></div>
       </div>
 
       <div className="relative flex min-h-screen items-center justify-center px-4 py-12">
         <div className="max-w-4xl w-full">
           {/* Hero Section */}
           <div className="text-center mb-12 animate-fade-in">
-            <div className="inline-flex items-center justify-center p-2 bg-gradient-to-r from-primary-600 to-secondary-600 rounded-2xl mb-6 shadow-soft-lg">
-              <BookOpenIcon className="h-12 w-12 text-white" />
+            <div className="inline-flex items-center justify-center p-4 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-3xl mb-8 shadow-card">
+              <BookOpenIcon className="h-14 w-14 text-white" />
             </div>
-            <h1 className="text-6xl font-display font-bold mb-4 gradient-text">
+            <h1 className="text-7xl font-display font-bold mb-6 bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
               LogBook
             </h1>
-            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+            <p className="text-2xl text-gray-700 dark:text-gray-300 max-w-2xl mx-auto leading-relaxed">
               あなたの日々を記録する、シンプルで美しい日記アプリ
             </p>
           </div>
 
           {/* Main Card */}
-          <div className="glass rounded-3xl shadow-soft-lg p-8 mb-8 animate-slide-up space-y-4">
+          <div className="card p-10 mb-10 animate-slide-up space-y-6">
             <button
               onClick={handleGoogleSignIn}
-              className="w-full bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 font-semibold text-lg py-4 px-8 rounded-xl shadow-soft hover:shadow-soft-lg transform hover:scale-[1.02] transition-all duration-200 flex items-center justify-center gap-3 border border-gray-300 dark:border-gray-600"
+              className="w-full bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 font-semibold text-lg py-5 px-8 rounded-button shadow-card hover:shadow-soft-lg transform hover:scale-[1.01] transition-all duration-200 flex items-center justify-center gap-3 border border-gray-200 dark:border-gray-700"
             >
               <svg className="h-6 w-6" viewBox="0 0 24 24">
                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -128,22 +127,22 @@ export default function Home() {
 
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300 dark:border-gray-600"></div>
+                <div className="w-full border-t border-gray-200 dark:border-gray-700"></div>
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-4 bg-white/80 dark:bg-gray-800/80 text-gray-500 dark:text-gray-400">または</span>
+                <span className="px-6 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 font-medium">または</span>
               </div>
             </div>
 
             <button
               onClick={handleAnonymousSignIn}
-              className="w-full gradient-primary text-white font-semibold text-lg py-4 px-8 rounded-xl shadow-soft hover:shadow-soft-lg transform hover:scale-[1.02] transition-all duration-200 flex items-center justify-center gap-3"
+              className="w-full bg-gradient-to-r from-primary-500 to-secondary-500 hover:from-primary-600 hover:to-secondary-600 text-white font-semibold text-lg py-5 px-8 rounded-button shadow-card hover:shadow-soft-lg transform hover:scale-[1.01] transition-all duration-200 flex items-center justify-center gap-3"
             >
               <SparklesIcon className="h-6 w-6" />
               ゲストとして始める
             </button>
 
-            <p className="text-xs text-center text-gray-500 dark:text-gray-400 mt-4">
+            <p className="text-sm text-center text-gray-600 dark:text-gray-400 mt-2 leading-relaxed">
               ゲストモードは一時的なアカウントです。<br />
               複数デバイスで使うにはGoogleログインをご利用ください。
             </p>
@@ -154,16 +153,16 @@ export default function Home() {
             {features.map((feature, index) => (
               <div
                 key={index}
-                className="glass rounded-2xl p-6 hover:shadow-soft-lg transition-all duration-300 transform hover:scale-[1.02]"
+                className="card p-8 hover:shadow-soft-lg transition-all duration-300 transform hover:scale-[1.01]"
                 style={{ animationDelay: `${0.1 * (index + 1)}s` }}
               >
-                <div className={`inline-flex p-3 ${feature.bgColor} rounded-xl mb-4`}>
-                  <feature.icon className={`h-6 w-6 ${feature.color}`} />
+                <div className={`inline-flex p-3.5 bg-gradient-to-br from-${feature.color.replace('text-', '')}-100 to-${feature.color.replace('text-', '')}-50 dark:from-${feature.color.replace('text-', '')}-900/30 dark:to-${feature.color.replace('text-', '')}-800/20 rounded-2xl mb-5`}>
+                  <feature.icon className={`h-7 w-7 ${feature.color}`} />
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">
                   {feature.title}
                 </h3>
-                <p className="text-gray-600 dark:text-gray-300">
+                <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
                   {feature.description}
                 </p>
               </div>
@@ -171,8 +170,8 @@ export default function Home() {
           </div>
 
           {/* Footer */}
-          <div className="text-center mt-12 animate-fade-in" style={{ animationDelay: '0.6s' }}>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
+          <div className="text-center mt-16 animate-fade-in" style={{ animationDelay: '0.6s' }}>
+            <p className="text-base text-gray-600 dark:text-gray-400 leading-relaxed">
               匿名認証で簡単にスタート • データは安全に保存されます
             </p>
           </div>

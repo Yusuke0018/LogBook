@@ -139,26 +139,26 @@ export default function DashboardPage() {
   const entryDates = entries.map((entry) => entry.createdAt.toDate());
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Header with glassmorphism */}
-      <header className="glass sticky top-0 z-10 border-b border-gray-200/50 dark:border-gray-700/50">
-        <div className="container mx-auto px-4 py-4">
+    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-secondary-50 dark:bg-gray-900">
+      {/* Header with clean design */}
+      <header className="glass sticky top-0 z-10 shadow-sm">
+        <div className="container mx-auto px-6 py-5">
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-3">
-              <div className="p-2 gradient-primary rounded-xl">
+              <div className="p-2.5 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-2xl shadow-soft">
                 <svg className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                 </svg>
               </div>
-              <h1 className="text-2xl font-display font-bold gradient-text">
+              <h1 className="text-2xl font-display font-bold bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
                 LogBook
               </h1>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
               <ThemeToggle />
               <button
                 onClick={signOut}
-                className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors rounded-lg hover:bg-gray-100/50 dark:hover:bg-gray-800/50"
+                className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-all rounded-button hover:bg-gray-50 dark:hover:bg-gray-800"
               >
                 <ArrowRightOnRectangleIcon className="h-5 w-5" />
                 ログアウト
@@ -168,19 +168,19 @@ export default function DashboardPage() {
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <main className="container mx-auto px-6 py-10">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-2 space-y-8">
             {/* New Entry Card */}
-            <div className="glass rounded-2xl shadow-soft-lg p-6 animate-fade-in">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="p-2 bg-primary-100 dark:bg-primary-900/30 rounded-xl">
-                  <svg className="h-5 w-5 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div className="card p-8 animate-fade-in">
+              <div className="flex items-center gap-3 mb-8">
+                <div className="p-2.5 bg-gradient-to-br from-primary-100 to-secondary-100 dark:from-primary-900/30 dark:to-secondary-900/30 rounded-2xl">
+                  <svg className="h-6 w-6 text-primary-600 dark:text-primary-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                   </svg>
                 </div>
-                <h2 className="text-xl font-display font-semibold text-gray-900 dark:text-white">
+                <h2 className="text-2xl font-display font-bold text-gray-900 dark:text-white">
                   新しい投稿
                 </h2>
               </div>
@@ -188,30 +188,30 @@ export default function DashboardPage() {
             </div>
 
             {/* Entries List Card */}
-            <div className="glass rounded-2xl shadow-soft-lg p-6 animate-slide-up">
-              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
+            <div className="card p-8 animate-slide-up">
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-6 mb-8">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-secondary-100 dark:bg-secondary-900/30 rounded-xl">
-                    <svg className="h-5 w-5 text-secondary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <div className="p-2.5 bg-gradient-to-br from-secondary-100 to-accent-100 dark:from-secondary-900/30 dark:to-accent-900/30 rounded-2xl">
+                    <svg className="h-6 w-6 text-secondary-600 dark:text-secondary-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
                   </div>
                   <div>
-                    <h2 className="text-xl font-display font-semibold text-gray-900 dark:text-white">
+                    <h2 className="text-2xl font-display font-bold text-gray-900 dark:text-white">
                       {selectedDate
                         ? format(selectedDate, 'yyyy年MM月dd日', { locale: ja })
                         : 'すべての投稿'}
                     </h2>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-0.5">
                       {filteredEntries.length}件の投稿
                     </p>
                   </div>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex gap-3">
                   <button
                     onClick={handleCopyToClipboard}
                     disabled={filteredEntries.length === 0}
-                    className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-white dark:hover:bg-gray-800 hover:shadow-soft transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-button hover:bg-gray-100 dark:hover:bg-gray-700 hover:shadow-soft transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                     title="クリップボードにコピー"
                   >
                     <ClipboardDocumentIcon className="h-5 w-5" />
@@ -219,7 +219,7 @@ export default function DashboardPage() {
                   </button>
                   <button
                     onClick={() => setIsExportModalOpen(true)}
-                    className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-primary-600 to-secondary-600 rounded-xl hover:shadow-soft-lg transition-all"
+                    className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-gradient-to-r from-primary-500 to-secondary-500 rounded-button hover:shadow-soft-lg hover:from-primary-600 hover:to-secondary-600 transition-all"
                     title="CSVエクスポート"
                   >
                     <ArrowDownTrayIcon className="h-5 w-5" />
