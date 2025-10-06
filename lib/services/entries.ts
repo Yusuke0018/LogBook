@@ -48,10 +48,24 @@ export async function updateEntry(
   }
 
   const entryRef = doc(db, COLLECTION_NAME, entryId);
+
+  // undefinedの値を除外
   const updateData: Record<string, unknown> = {
-    ...data,
     updatedAt: Timestamp.now(),
   };
+
+  if (data.title !== undefined) {
+    updateData.title = data.title;
+  }
+  if (data.content !== undefined) {
+    updateData.content = data.content;
+  }
+  if (data.tags !== undefined) {
+    updateData.tags = data.tags;
+  }
+  if (data.weather !== undefined) {
+    updateData.weather = data.weather;
+  }
 
   await updateDoc(entryRef, updateData);
 }
