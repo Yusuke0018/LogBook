@@ -52,30 +52,30 @@ export default function EntryForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div>
+    <form onSubmit={handleSubmit} className="space-y-5">
+      <div className="space-y-2">
         <label
           htmlFor="title"
-          className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+          className="block text-sm font-semibold text-gray-700 dark:text-gray-300"
         >
-          タイトル（任意）
+          タイトル<span className="text-gray-400 font-normal ml-1">(任意)</span>
         </label>
         <input
           type="text"
           id="title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+          className="w-full px-4 py-3 bg-white/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:text-white transition-all placeholder:text-gray-400"
           placeholder="タイトルを入力"
         />
       </div>
 
-      <div>
+      <div className="space-y-2">
         <label
           htmlFor="content"
-          className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+          className="block text-sm font-semibold text-gray-700 dark:text-gray-300"
         >
-          本文 <span className="text-red-500">*</span>
+          本文 <span className="text-accent-500">*</span>
         </label>
         <textarea
           id="content"
@@ -83,33 +83,33 @@ export default function EntryForm({
           onChange={(e) => setContent(e.target.value)}
           rows={6}
           required
-          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+          className="w-full px-4 py-3 bg-white/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:text-white transition-all placeholder:text-gray-400 resize-none"
           placeholder="今日の出来事を記録..."
         />
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        <div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="space-y-2">
           <label
             htmlFor="tags"
-            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+            className="block text-sm font-semibold text-gray-700 dark:text-gray-300"
           >
-            タグ（カンマ区切り）
+            タグ
           </label>
           <input
             type="text"
             id="tags"
             value={tags}
             onChange={(e) => setTags(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+            className="w-full px-4 py-3 bg-white/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:text-white transition-all placeholder:text-gray-400"
             placeholder="仕事, プライベート"
           />
         </div>
 
-        <div>
+        <div className="space-y-2">
           <label
             htmlFor="weather"
-            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+            className="block text-sm font-semibold text-gray-700 dark:text-gray-300"
           >
             天気
           </label>
@@ -118,19 +118,19 @@ export default function EntryForm({
             id="weather"
             value={weather}
             onChange={(e) => setWeather(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-            placeholder="晴れ, 曇り, 雨"
+            className="w-full px-4 py-3 bg-white/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:text-white transition-all placeholder:text-gray-400"
+            placeholder="☀️ 晴れ / ☁️ 曇り / 🌧️ 雨"
           />
         </div>
       </div>
 
-      <div className="flex justify-end">
+      <div className="flex justify-end pt-2">
         <button
           type="submit"
           disabled={isSubmitting || !content.trim()}
-          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold text-white gradient-primary rounded-xl shadow-soft hover:shadow-soft-lg transform hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
         >
-          <PaperAirplaneIcon className="h-5 w-5 mr-2" />
+          <PaperAirplaneIcon className="h-5 w-5" />
           {isSubmitting ? '送信中...' : submitLabel}
         </button>
       </div>
