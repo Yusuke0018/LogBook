@@ -46,6 +46,7 @@ export default function DashboardPage() {
     if (user) {
       loadEntries();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   useEffect(() => {
