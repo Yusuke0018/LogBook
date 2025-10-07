@@ -481,7 +481,7 @@ export default function DashboardPage() {
                     検索とフィルタ
                   </h3>
                   <p className="text-sm text-gray-500 dark:text-gray-400">
-                    キーワードやタグで過去ログを素早く探せます
+                    キーワードと日付で過去ログを素早く探せます
                   </p>
                 </div>
                 <div className="flex flex-wrap gap-2">
