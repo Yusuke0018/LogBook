@@ -47,7 +47,7 @@ export default function InsightsPanel({
   const summaries = [daily, weekly, monthly];
 
   return (
-    <div className="card p-6 space-y-6 animate-slide-up">
+    <div className="card p-6 space-y-6 animate-slide-up overflow-hidden">
       <div>
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
