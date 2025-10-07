@@ -1,0 +1,17 @@
+timestamp: 2025-10-07 12:07:55 JST
+branch: main
+latest_commit: 33310276838712dff6041a145bdd55535c835048
+diff_stat:
+  app/(protected)/dashboard/page.tsx | 285 ++-----------------------------------
+  components/EntryForm.tsx           |  47 +-----
+  components/EntryList.tsx           |  12 --
+  components/InsightsPanel.tsx       |  13 +-
+  lib/constants/entry.ts             |   9 --
+  lib/services/entries.ts            |   8 --
+  lib/types.ts                       |   2 -
+  lib/utils/export.ts                |  10 +-
+commands:
+  - npm run lint
+push: pending
+notes:
+  Removed body-condition tracking, simplified filters, and adjusted summaries as requested.

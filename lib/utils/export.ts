@@ -10,11 +10,8 @@ export function entriesToText(entries: Entry[]): string {
       const title = entry.title ? `【${entry.title}】` : '';
       const moodText =
         typeof entry.mood === 'number' ? `気分 ${entry.mood}` : '';
-      const conditionsText = entry.conditions?.length
-        ? `体調 ${entry.conditions.join(', ')}`
-        : '';
       const weatherText = entry.weather ? `天気 ${entry.weather}` : '';
-      const meta = [moodText, conditionsText, weatherText]
+      const meta = [moodText, weatherText]
         .filter(Boolean)
         .join(' / ');
 
@@ -25,7 +22,7 @@ export function entriesToText(entries: Entry[]): string {
 }
 
 export function entriesToCSV(entries: Entry[]): string {
-  const headers = ['日時', 'タイトル', '本文', 'タグ', '天気', '気分スコア', '体調メモ'];
+  const headers = ['日時', 'タイトル', '本文', 'タグ', '天気', '気分スコア'];
   const rows = entries.map((entry) => {
     const date = entry.createdAt.toDate();
     const dateStr = format(date, 'yyyy-MM-dd HH:mm:ss', { locale: ja });
@@ -34,8 +31,7 @@ export function entriesToCSV(entries: Entry[]): string {
     const tags = entry.tags?.join(';') || '';
     const weather = entry.weather || '';
     const mood = typeof entry.mood === 'number' ? entry.mood.toString() : '';
-    const conditions = entry.conditions?.join(';') || '';
-    return [dateStr, title, content, tags, weather, mood, conditions].join(',');
+    return [dateStr, title, content, tags, weather, mood].join(',');
   });
 
   return [headers.join(','), ...rows].join('\n');

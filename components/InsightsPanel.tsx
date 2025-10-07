@@ -14,8 +14,6 @@ export interface SummaryData {
   entryCount: number;
   averageMood: number | null;
   topTags: SummaryItem[];
-  topConditions: SummaryItem[];
-  topKeywords: SummaryItem[];
   topWeather: SummaryItem[];
 }
 
@@ -28,15 +26,14 @@ interface InsightsPanelProps {
   onTrendPeriodChange: (period: '7' | '30') => void;
 }
 
-const SUMMARY_SECTIONS: Array<
-  'topTags' | 'topConditions' | 'topWeather' | 'topKeywords'
-> = ['topTags', 'topConditions', 'topWeather', 'topKeywords'];
+const SUMMARY_SECTIONS: Array<'topTags' | 'topWeather'> = [
+  'topTags',
+  'topWeather',
+];
 
 const SECTION_LABEL: Record<(typeof SUMMARY_SECTIONS)[number], string> = {
   topTags: 'タグ上位',
-  topConditions: '体調メモ上位',
   topWeather: '天気上位',
-  topKeywords: 'キーワード',
 };
 
 export default function InsightsPanel({
@@ -131,7 +128,7 @@ function SummaryCard({ summary }: { summary: SummaryData }) {
         <SummaryList
           key={key}
           title={SECTION_LABEL[key]}
-          items={summary[key]}
+          items={key === 'topTags' ? summary.topTags : summary.topWeather}
         />
       ))}
     </section>

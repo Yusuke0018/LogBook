@@ -32,7 +32,6 @@ export async function createEntry(
     tags: data.tags || [],
     weather: data.weather || '',
     mood: data.mood ?? null,
-    conditions: data.conditions || [],
     createdAt: now,
     updatedAt: now,
   };
@@ -70,9 +69,6 @@ export async function updateEntry(
   }
   if (data.mood !== undefined) {
     updateData.mood = data.mood;
-  }
-  if (data.conditions !== undefined) {
-    updateData.conditions = data.conditions;
   }
 
   await updateDoc(entryRef, updateData);
@@ -161,10 +157,6 @@ export function entryMatchesSearchTerm(entry: Entry, searchTerm: string) {
 
   if (entry.tags) {
     targets.push(...entry.tags);
-  }
-
-  if (entry.conditions) {
-    targets.push(...entry.conditions);
   }
 
   return targets

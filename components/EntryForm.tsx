@@ -3,10 +3,7 @@
 import { useState, useEffect } from 'react';
 import { PaperAirplaneIcon } from '@heroicons/react/24/solid';
 import type { EntryFormData } from '@/lib/types';
-import {
-  CONDITION_OPTIONS,
-  MOOD_SCALE,
-} from '@/lib/constants/entry';
+import { MOOD_SCALE } from '@/lib/constants/entry';
 
 interface EntryFormProps {
   onSubmit: (data: EntryFormData) => Promise<void>;
@@ -26,7 +23,6 @@ export default function EntryForm({
   const [tags, setTags] = useState('');
   const [weather, setWeather] = useState('');
   const [mood, setMood] = useState<number | null>(null);
-  const [conditions, setConditions] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // initialDataが変更されたときにフォームを更新
@@ -39,27 +35,17 @@ export default function EntryForm({
       setMood(
         typeof initialData.mood === 'number' ? initialData.mood : null
       );
-      setConditions(initialData.conditions || []);
     } else {
       setTitle('');
       setContent('');
       setTags('');
       setWeather('');
       setMood(null);
-      setConditions([]);
     }
   }, [initialData]);
 
   const handleMoodSelect = (value: number) => {
     setMood((prev) => (prev === value ? null : value));
-  };
-
-  const toggleCondition = (value: string) => {
-    setConditions((prev) =>
-      prev.includes(value)
-        ? prev.filter((item) => item !== value)
-        : [...prev, value]
-    );
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -77,7 +63,6 @@ export default function EntryForm({
           .filter(Boolean),
         weather: weather.trim() || undefined,
         mood,
-        conditions,
       };
 
       await onSubmit(data);
@@ -89,7 +74,6 @@ export default function EntryForm({
         setTags('');
         setWeather('');
         setMood(null);
-        setConditions([]);
       }
     } catch (error) {
       console.error('投稿エラー:', error);
@@ -209,35 +193,6 @@ export default function EntryForm({
                   {option.label}
                 </span>
               </button>
-            );
-          })}
-        </div>
-      </div>
-
-      <div className="space-y-2">
-        <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-          体調メモ
-        </label>
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-          {CONDITION_OPTIONS.map((option) => {
-            const checked = conditions.includes(option);
-            return (
-              <label
-                key={option}
-                className={`flex items-center gap-2 px-3 py-2 rounded-xl border cursor-pointer transition-all ${
-                  checked
-                    ? 'border-secondary-500 bg-secondary-50 text-secondary-600 dark:bg-secondary-900/30 dark:border-secondary-400 dark:text-secondary-200'
-                    : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:border-secondary-300 dark:hover:border-secondary-600'
-                }`}
-              >
-                <input
-                  type="checkbox"
-                  checked={checked}
-                  onChange={() => toggleCondition(option)}
-                  className="hidden"
-                />
-                <span className="text-sm">{option}</span>
-              </label>
             );
           })}
         </div>

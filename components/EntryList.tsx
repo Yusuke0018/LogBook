@@ -80,18 +80,6 @@ export default function EntryList({
                 気分 {entry.mood} ({MOOD_LABEL_MAP[entry.mood] || '未設定'})
               </span>
             )}
-            {entry.conditions && entry.conditions.length > 0 && (
-              <div className="flex flex-wrap gap-1">
-                {entry.conditions.map((condition, index) => (
-                  <span
-                    key={`${condition}-${index}`}
-                    className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-secondary-100 text-secondary-800 dark:bg-secondary-900/30 dark:text-secondary-200"
-                  >
-                    {condition}
-                  </span>
-                ))}
-              </div>
-            )}
             {entry.tags && entry.tags.length > 0 && (
               <div className="flex flex-wrap gap-1">
                 {entry.tags.map((tag, index) => (
