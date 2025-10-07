@@ -1,0 +1,19 @@
+timestamp: 2025-10-07 10:21:13 JST
+branch: main
+latest_commit: 3707b6d651dbfd19a772453f0ad2230d44e31649
+diff_stat:
+  app/(protected)/dashboard/page.tsx | 676 +++++++++++++++++++++++++++++++++++--
+  components/EntryForm.tsx           | 100 ++++++
+  components/EntryList.tsx           |  21 ++
+  lib/services/entries.ts            |  51 ++-
+  lib/types.ts                       |   4 +
+  lib/utils/export.ts                |  19 +-
+new_files:
+  components/InsightsPanel.tsx
+  components/MoodTrendChart.tsx
+  lib/constants/entry.ts
+tests:
+  - npm run lint (pass)
+install:
+  - npm install
+push: not run (per instructions)

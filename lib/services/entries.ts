@@ -31,6 +31,8 @@ export async function createEntry(
     content: data.content,
     tags: data.tags || [],
     weather: data.weather || '',
+    mood: data.mood ?? null,
+    conditions: data.conditions || [],
     createdAt: now,
     updatedAt: now,
   };
@@ -65,6 +67,12 @@ export async function updateEntry(
   }
   if (data.weather !== undefined) {
     updateData.weather = data.weather;
+  }
+  if (data.mood !== undefined) {
+    updateData.mood = data.mood;
+  }
+  if (data.conditions !== undefined) {
+    updateData.conditions = data.conditions;
   }
 
   await updateDoc(entryRef, updateData);
@@ -139,17 +147,40 @@ export async function getEntriesByDateRange(
   })) as Entry[];
 }
 
+export function entryMatchesSearchTerm(entry: Entry, searchTerm: string) {
+  const normalized = searchTerm.trim().toLowerCase();
+  if (!normalized) {
+    return true;
+  }
+
+  const targets: string[] = [
+    entry.content,
+    entry.title || '',
+    entry.weather || '',
+  ];
+
+  if (entry.tags) {
+    targets.push(...entry.tags);
+  }
+
+  if (entry.conditions) {
+    targets.push(...entry.conditions);
+  }
+
+  return targets
+    .map((value) => value.toLowerCase())
+    .some((value) => value.includes(normalized));
+}
+
 export async function searchEntries(
   userId: string,
-  searchTerm: string
+  searchTerm: string,
+  sourceEntries?: Entry[]
 ): Promise<Entry[]> {
-  const entries = await getEntriesByUser(userId);
-  return entries.filter(
-    (entry) =>
-      entry.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      entry.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      entry.tags?.some((tag) =>
-        tag.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-  );
+  const entries = sourceEntries || (await getEntriesByUser(userId));
+  if (!searchTerm.trim()) {
+    return entries;
+  }
+
+  return entries.filter((entry) => entryMatchesSearchTerm(entry, searchTerm));
 }

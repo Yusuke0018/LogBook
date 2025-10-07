@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '@/lib/hooks/useAuth';
 import {
   createEntry,
@@ -8,6 +8,7 @@ import {
   deleteEntry,
   getEntriesByUser,
   getEntriesByDateRange,
+  entryMatchesSearchTerm,
 } from '@/lib/services/entries';
 
 // Force dynamic rendering
@@ -18,13 +19,28 @@ import {
   downloadCSV,
   copyToClipboard,
 } from '@/lib/utils/export';
-import { format, startOfDay, endOfDay } from 'date-fns';
+import {
+  format,
+  startOfDay,
+  endOfDay,
+  startOfWeek,
+  endOfWeek,
+  startOfMonth,
+  endOfMonth,
+  isSameDay,
+  addDays,
+} from 'date-fns';
 import { ja } from 'date-fns/locale';
 import EntryForm from '@/components/EntryForm';
 import EntryList from '@/components/EntryList';
 import Calendar from '@/components/Calendar';
 import ExportModal from '@/components/ExportModal';
 import Toast from '@/components/Toast';
+import InsightsPanel, {
+  SummaryData,
+  SummaryItem,
+  MoodTrendPoint,
+} from '@/components/InsightsPanel';
 import {
   ClipboardDocumentIcon,
   ArrowDownTrayIcon,
@@ -32,14 +48,261 @@ import {
 } from '@heroicons/react/24/outline';
 import ThemeToggle from '@/components/ThemeToggle';
 import type { Entry, EntryFormData } from '@/lib/types';
+import { CONDITION_OPTIONS, MOOD_SCALE } from '@/lib/constants/entry';
+
+type TrendPeriod = '7' | '30';
+
+interface FiltersState {
+  searchTerm: string;
+  selectedTags: string[];
+  selectedWeather: string[];
+  selectedConditions: string[];
+  startDate: string;
+  endDate: string;
+  moodMin: string;
+  moodMax: string;
+}
+
+const INITIAL_FILTERS: FiltersState = {
+  searchTerm: '',
+  selectedTags: [],
+  selectedWeather: [],
+  selectedConditions: [],
+  startDate: '',
+  endDate: '',
+  moodMin: '',
+  moodMax: '',
+};
+
+const KEYWORD_STOPWORDS = new Set([
+  'です',
+  'ます',
+  'した',
+  'する',
+  'なる',
+  'こと',
+  'よう',
+  'ため',
+]);
+
+const filterEntries = (
+  entries: Entry[],
+  selectedDate: Date | undefined,
+  filters: FiltersState
+): Entry[] => {
+  return entries.filter((entry) => {
+    const entryDate = entry.createdAt.toDate();
+
+    if (selectedDate && !isSameDay(entryDate, selectedDate)) {
+      return false;
+    }
+
+    if (filters.startDate) {
+      const start = startOfDay(new Date(filters.startDate));
+      if (entryDate < start) return false;
+    }
+
+    if (filters.endDate) {
+      const end = endOfDay(new Date(filters.endDate));
+      if (entryDate > end) return false;
+    }
+
+    if (filters.searchTerm.trim()) {
+      if (!entryMatchesSearchTerm(entry, filters.searchTerm)) {
+        return false;
+      }
+    }
+
+    if (filters.selectedTags.length > 0) {
+      const tagSet = new Set(
+        (entry.tags || []).map((tag) => tag.toLowerCase())
+      );
+      const hasMatch = filters.selectedTags.some((tag) =>
+        tagSet.has(tag.toLowerCase())
+      );
+      if (!hasMatch) {
+        return false;
+      }
+    }
+
+    if (filters.selectedWeather.length > 0) {
+      const weather = (entry.weather || '').toLowerCase();
+      if (!weather) return false;
+      const hasWeather = filters.selectedWeather.some(
+        (target) => target.toLowerCase() === weather
+      );
+      if (!hasWeather) {
+        return false;
+      }
+    }
+
+    if (filters.selectedConditions.length > 0) {
+      const entryConditions = entry.conditions || [];
+      const hasAll = filters.selectedConditions.every((condition) =>
+        entryConditions.includes(condition)
+      );
+      if (!hasAll) {
+        return false;
+      }
+    }
+
+    const moodMin = filters.moodMin ? Number(filters.moodMin) : null;
+    const moodMax = filters.moodMax ? Number(filters.moodMax) : null;
+    if (moodMin !== null || moodMax !== null) {
+      if (typeof entry.mood !== 'number') {
+        return false;
+      }
+      if (moodMin !== null && entry.mood < moodMin) {
+        return false;
+      }
+      if (moodMax !== null && entry.mood > moodMax) {
+        return false;
+      }
+    }
+
+    return true;
+  });
+};
+
+const collectTopItems = (
+  values: string[],
+  limit = 5
+): SummaryItem[] => {
+  const counts = new Map<string, SummaryItem>();
+  values
+    .map((value) => value.trim())
+    .filter(Boolean)
+    .forEach((value) => {
+      const existing = counts.get(value);
+      if (existing) {
+        existing.count += 1;
+      } else {
+        counts.set(value, { label: value, count: 1 });
+      }
+    });
+
+  return Array.from(counts.values())
+    .sort((a, b) => {
+      if (b.count !== a.count) {
+        return b.count - a.count;
+      }
+      return a.label.localeCompare(b.label, 'ja');
+    })
+    .slice(0, limit);
+};
+
+const extractKeywords = (
+  entries: Entry[],
+  limit = 5
+): SummaryItem[] => {
+  const counts = new Map<string, SummaryItem>();
+
+  entries.forEach((entry) => {
+    const normalized = entry.content
+      .replace(/[\n\r]/g, ' ')
+      .split(/[、。,\.\s!！?？;:「」『』【】\[\]\(\)\/\\-]+/)
+      .map((word) => word.trim())
+      .filter((word) => word.length >= 2 && !KEYWORD_STOPWORDS.has(word));
+
+    normalized.forEach((word) => {
+      const key = word.toLowerCase();
+      const existing = counts.get(key);
+      if (existing) {
+        existing.count += 1;
+      } else {
+        counts.set(key, { label: word, count: 1 });
+      }
+    });
+  });
+
+  return Array.from(counts.values())
+    .sort((a, b) => {
+      if (b.count !== a.count) {
+        return b.count - a.count;
+      }
+      return a.label.localeCompare(b.label, 'ja');
+    })
+    .slice(0, limit);
+};
+
+const createSummary = (title: string, entries: Entry[]): SummaryData => {
+  const moodValues = entries
+    .map((entry) => entry.mood)
+    .filter((value): value is number => typeof value === 'number');
+
+  const averageMood = moodValues.length
+    ? Number(
+        (
+          moodValues.reduce((sum, value) => sum + value, 0) /
+          moodValues.length
+        ).toFixed(1)
+      )
+    : null;
+
+  const tagValues = entries.flatMap((entry) => entry.tags || []);
+  const conditionValues = entries.flatMap(
+    (entry) => entry.conditions || []
+  );
+  const weatherValues = entries
+    .map((entry) => entry.weather)
+    .filter((value): value is string => Boolean(value && value.trim()));
+
+  return {
+    title,
+    entryCount: entries.length,
+    averageMood,
+    topTags: collectTopItems(tagValues),
+    topConditions: collectTopItems(conditionValues),
+    topWeather: collectTopItems(weatherValues, 3),
+    topKeywords: extractKeywords(entries),
+  };
+};
+
+const buildMoodTrend = (
+  entries: Entry[],
+  referenceDate: Date,
+  period: number
+): MoodTrendPoint[] => {
+  const data: MoodTrendPoint[] = [];
+
+  for (let i = period - 1; i >= 0; i -= 1) {
+    const dayStart = startOfDay(addDays(referenceDate, -i));
+    const dayEnd = endOfDay(dayStart);
+    const dailyEntries = entries.filter((entry) => {
+      const date = entry.createdAt.toDate();
+      return date >= dayStart && date <= dayEnd;
+    });
+
+    const moodValues = dailyEntries
+      .map((entry) => entry.mood)
+      .filter((value): value is number => typeof value === 'number');
+
+    const averageMood = moodValues.length
+      ? Number(
+          (
+            moodValues.reduce((sum, value) => sum + value, 0) /
+            moodValues.length
+          ).toFixed(2)
+        )
+      : null;
+
+    data.push({
+      dateLabel: format(dayStart, period > 7 ? 'MM/dd' : 'MM/dd', {
+        locale: ja,
+      }),
+      averageMood,
+    });
+  }
+
+  return data;
+};
 
 export default function DashboardPage() {
   const { user, signOut } = useAuth();
   const [entries, setEntries] = useState<Entry[]>([]);
-  const [filteredEntries, setFilteredEntries] = useState<Entry[]>([]);
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(
-    new Date()
-  );
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
+  const [filters, setFilters] = useState<FiltersState>(INITIAL_FILTERS);
+  const [trendPeriod, setTrendPeriod] = useState<TrendPeriod>('7');
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [editingEntry, setEditingEntry] = useState<Entry | null>(null);
   const [toast, setToast] = useState<{
@@ -54,21 +317,6 @@ export default function DashboardPage() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
-
-  useEffect(() => {
-    if (selectedDate) {
-      const filtered = entries.filter((entry) => {
-        const entryDate = entry.createdAt.toDate();
-        return (
-          format(entryDate, 'yyyy-MM-dd') ===
-          format(selectedDate, 'yyyy-MM-dd')
-        );
-      });
-      setFilteredEntries(filtered);
-    } else {
-      setFilteredEntries(entries);
-    }
-  }, [entries, selectedDate]);
 
   const loadEntries = async () => {
     if (!user) return;
@@ -131,6 +379,170 @@ export default function DashboardPage() {
     }
   };
 
+  const toggleFilterItem = (
+    key: 'selectedTags' | 'selectedWeather' | 'selectedConditions',
+    value: string
+  ) => {
+    setFilters((prev) => {
+      const current = new Set(prev[key]);
+      if (current.has(value)) {
+        current.delete(value);
+      } else {
+        current.add(value);
+      }
+      return {
+        ...prev,
+        [key]: Array.from(current),
+      };
+    });
+  };
+
+  const updateFilterValue = <K extends keyof FiltersState>(
+    key: K,
+    value: FiltersState[K]
+  ) => {
+    setFilters((prev) => ({
+      ...prev,
+      [key]: value,
+    }));
+  };
+
+  const clearFilters = () => {
+    setFilters(INITIAL_FILTERS);
+    setSelectedDate(undefined);
+  };
+
+  const clearSelectedDate = () => {
+    setSelectedDate(undefined);
+  };
+
+  const handleTrendPeriodChange = (period: TrendPeriod) => {
+    setTrendPeriod(period);
+  };
+
+  const availableConditions = useMemo(
+    () => Array.from(CONDITION_OPTIONS),
+    []
+  );
+
+  const availableTags = useMemo(() => {
+    const set = new Set<string>();
+    entries.forEach((entry) => {
+      (entry.tags || []).forEach((tag) => set.add(tag));
+    });
+    return Array.from(set).sort((a, b) => a.localeCompare(b, 'ja'));
+  }, [entries]);
+
+  const availableWeather = useMemo(() => {
+    const set = new Set<string>();
+    entries.forEach((entry) => {
+      if (entry.weather) {
+        set.add(entry.weather);
+      }
+    });
+    return Array.from(set).sort((a, b) => a.localeCompare(b, 'ja'));
+  }, [entries]);
+
+  const filteredEntries = useMemo(
+    () => filterEntries(entries, selectedDate, filters),
+    [entries, selectedDate, filters]
+  );
+
+  const filtersActive = useMemo(() => {
+    return (
+      Boolean(filters.searchTerm.trim()) ||
+      filters.selectedTags.length > 0 ||
+      filters.selectedWeather.length > 0 ||
+      filters.selectedConditions.length > 0 ||
+      Boolean(filters.startDate) ||
+      Boolean(filters.endDate) ||
+      Boolean(filters.moodMin) ||
+      Boolean(filters.moodMax)
+    );
+  }, [filters]);
+
+  const referenceDate = useMemo(
+    () => selectedDate ?? new Date(),
+    [selectedDate]
+  );
+  const weekStart = useMemo(
+    () => startOfWeek(referenceDate, { locale: ja }),
+    [referenceDate]
+  );
+  const weekEnd = useMemo(
+    () => endOfWeek(referenceDate, { locale: ja }),
+    [referenceDate]
+  );
+  const monthStart = useMemo(() => startOfMonth(referenceDate), [referenceDate]);
+  const monthEnd = useMemo(() => endOfMonth(referenceDate), [referenceDate]);
+
+  const dailyEntries = useMemo(
+    () =>
+      entries.filter((entry) =>
+        isSameDay(entry.createdAt.toDate(), referenceDate)
+      ),
+    [entries, referenceDate]
+  );
+
+  const weeklyEntries = useMemo(() => {
+    const start = startOfDay(weekStart);
+    const end = endOfDay(weekEnd);
+    return entries.filter((entry) => {
+      const date = entry.createdAt.toDate();
+      return date >= start && date <= end;
+    });
+  }, [entries, weekStart, weekEnd]);
+
+  const monthlyEntries = useMemo(() => {
+    const start = startOfDay(monthStart);
+    const end = endOfDay(monthEnd);
+    return entries.filter((entry) => {
+      const date = entry.createdAt.toDate();
+      return date >= start && date <= end;
+    });
+  }, [entries, monthStart, monthEnd]);
+
+  const dailySummary = useMemo(
+    () =>
+      createSummary(
+        format(referenceDate, 'MM月dd日 (EEE)', { locale: ja }),
+        dailyEntries
+      ),
+    [dailyEntries, referenceDate]
+  );
+
+  const weeklySummary = useMemo(() => {
+    const title = `週次 ${format(weekStart, 'MM/dd', {
+      locale: ja,
+    })}〜${format(weekEnd, 'MM/dd', { locale: ja })}`;
+    return createSummary(title, weeklyEntries);
+  }, [weekStart, weekEnd, weeklyEntries]);
+
+  const monthlySummary = useMemo(() => {
+    const title = `月次 ${format(monthStart, 'yyyy年MM月', {
+      locale: ja,
+    })}`;
+    return createSummary(title, monthlyEntries);
+  }, [monthStart, monthlyEntries]);
+
+  const moodTrendData = useMemo(
+    () => buildMoodTrend(entries, referenceDate, Number(trendPeriod)),
+    [entries, referenceDate, trendPeriod]
+  );
+
+  const entryDates = useMemo(
+    () => entries.map((entry) => entry.createdAt.toDate()),
+    [entries]
+  );
+
+  const listTitle = selectedDate
+    ? format(selectedDate, 'yyyy年MM月dd日', { locale: ja })
+    : filtersActive
+    ? '条件に一致する投稿'
+    : 'すべての投稿';
+
+  const isFilteredView = filtersActive || Boolean(selectedDate);
+
   const handleCopyToClipboard = async () => {
     try {
       const text = entriesToText(filteredEntries);
@@ -163,8 +575,6 @@ export default function DashboardPage() {
     setToast({ show: true, message, type });
     setTimeout(() => setToast({ show: false, message: '', type: 'success' }), 3000);
   };
-
-  const entryDates = entries.map((entry) => entry.createdAt.toDate());
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-secondary-50 dark:bg-gray-900">
@@ -220,6 +630,196 @@ export default function DashboardPage() {
               />
             </div>
 
+            {/* Filters Card */}
+            <div className="card p-6 space-y-6 animate-fade-in">
+              <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                    検索とフィルタ
+                  </h3>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    キーワードやタグで過去ログを素早く探せます
+                  </p>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {selectedDate && (
+                    <button
+                      type="button"
+                      onClick={clearSelectedDate}
+                      className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700"
+                    >
+                      日付フィルタ解除
+                    </button>
+                  )}
+                  {filtersActive && (
+                    <button
+                      type="button"
+                      onClick={clearFilters}
+                      className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-white bg-gradient-to-r from-primary-500 to-secondary-500 rounded-full hover:from-primary-600 hover:to-secondary-600"
+                    >
+                      条件リセット
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                    キーワード検索
+                  </label>
+                  <input
+                    type="search"
+                    value={filters.searchTerm}
+                    onChange={(e) => updateFilterValue('searchTerm', e.target.value)}
+                    placeholder="タイトル・本文・タグを横断検索"
+                    className="w-full px-4 py-3 bg-white/70 dark:bg-gray-800/70 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
+                  />
+                </div>
+
+                {availableTags.length > 0 && (
+                  <div className="space-y-2">
+                    <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                      タグ
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {availableTags.map((tag) => {
+                        const active = filters.selectedTags.includes(tag);
+                        return (
+                          <button
+                            key={tag}
+                            type="button"
+                            onClick={() => toggleFilterItem('selectedTags', tag)}
+                            className={`px-3 py-1.5 text-xs font-medium rounded-full border transition-all ${
+                              active
+                                ? 'border-primary-500 bg-primary-50 text-primary-600 dark:border-primary-400 dark:bg-primary-900/30 dark:text-primary-200'
+                                : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:border-primary-300 dark:hover:border-primary-500'
+                            }`}
+                          >
+                            #{tag}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {availableWeather.length > 0 && (
+                  <div className="space-y-2">
+                    <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                      天気
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {availableWeather.map((weather) => {
+                        const active = filters.selectedWeather.includes(weather);
+                        return (
+                          <button
+                            key={weather}
+                            type="button"
+                            onClick={() => toggleFilterItem('selectedWeather', weather)}
+                            className={`px-3 py-1.5 text-xs font-medium rounded-full border transition-all ${
+                              active
+                                ? 'border-secondary-500 bg-secondary-50 text-secondary-600 dark:border-secondary-400 dark:bg-secondary-900/30 dark:text-secondary-200'
+                                : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:border-secondary-300 dark:hover:border-secondary-500'
+                            }`}
+                          >
+                            {weather}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                      開始日
+                    </label>
+                    <input
+                      type="date"
+                      value={filters.startDate}
+                      onChange={(e) => updateFilterValue('startDate', e.target.value)}
+                      className="w-full px-3 py-2 bg-white/70 dark:bg-gray-800/70 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                      終了日
+                    </label>
+                    <input
+                      type="date"
+                      value={filters.endDate}
+                      onChange={(e) => updateFilterValue('endDate', e.target.value)}
+                      className="w-full px-3 py-2 bg-white/70 dark:bg-gray-800/70 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                      気分スコア（下限）
+                    </label>
+                    <select
+                      value={filters.moodMin}
+                      onChange={(e) => updateFilterValue('moodMin', e.target.value)}
+                      className="w-full px-3 py-2 bg-white/70 dark:bg-gray-800/70 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
+                    >
+                      <option value="">指定なし</option>
+                      {MOOD_SCALE.map((option) => (
+                        <option key={`mood-min-${option.value}`} value={option.value}>
+                          {option.value} ({option.label})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                      気分スコア（上限）
+                    </label>
+                    <select
+                      value={filters.moodMax}
+                      onChange={(e) => updateFilterValue('moodMax', e.target.value)}
+                      className="w-full px-3 py-2 bg-white/70 dark:bg-gray-800/70 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
+                    >
+                      <option value="">指定なし</option>
+                      {MOOD_SCALE.map((option) => (
+                        <option key={`mood-max-${option.value}`} value={option.value}>
+                          {option.value} ({option.label})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                    体調メモ
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {availableConditions.map((condition) => {
+                      const active = filters.selectedConditions.includes(condition);
+                      return (
+                        <button
+                          key={condition}
+                          type="button"
+                          onClick={() => toggleFilterItem('selectedConditions', condition)}
+                          className={`px-3 py-1.5 text-xs font-medium rounded-full border transition-all ${
+                            active
+                              ? 'border-accent-500 bg-accent-50 text-accent-600 dark:border-accent-400 dark:bg-accent-900/30 dark:text-accent-200'
+                              : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:border-accent-300 dark:hover:border-accent-500'
+                          }`}
+                        >
+                          {condition}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {/* Entries List Card */}
             <div className="card p-8 animate-slide-up">
               <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-6 mb-8">
@@ -230,13 +830,23 @@ export default function DashboardPage() {
                     </svg>
                   </div>
                   <div>
-                    <h2 className="text-2xl font-display font-bold text-gray-900 dark:text-white">
-                      {selectedDate
-                        ? format(selectedDate, 'yyyy年MM月dd日', { locale: ja })
-                        : 'すべての投稿'}
-                    </h2>
+                    <div className="flex items-center gap-2">
+                      <h2 className="text-2xl font-display font-bold text-gray-900 dark:text-white">
+                        {listTitle}
+                      </h2>
+                      {isFilteredView && (
+                        <span className="inline-flex items-center px-2 py-0.5 text-[11px] font-medium rounded-full bg-primary-100 text-primary-600 dark:bg-primary-900/30 dark:text-primary-300">
+                          フィルタ中
+                        </span>
+                      )}
+                    </div>
                     <p className="text-sm text-gray-600 dark:text-gray-400 mt-0.5">
                       {filteredEntries.length}件の投稿
+                      {isFilteredView && (
+                        <span className="ml-1 text-gray-400 dark:text-gray-500">
+                          / 全{entries.length}件
+                        </span>
+                      )}
                     </p>
                   </div>
                 </div>
@@ -270,11 +880,19 @@ export default function DashboardPage() {
 
           {/* Sidebar */}
           <div className="lg:col-span-1">
-            <div className="sticky top-24">
+            <div className="sticky top-24 space-y-6">
               <Calendar
                 entryDates={entryDates}
                 onDateSelect={setSelectedDate}
                 selectedDate={selectedDate}
+              />
+              <InsightsPanel
+                daily={dailySummary}
+                weekly={weeklySummary}
+                monthly={monthlySummary}
+                moodTrend={moodTrendData}
+                trendPeriod={trendPeriod}
+                onTrendPeriodChange={handleTrendPeriodChange}
               />
             </div>
           </div>

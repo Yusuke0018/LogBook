@@ -13,6 +13,8 @@ export interface Entry {
   content: string;
   tags?: string[];
   weather?: string;
+  mood?: number | null;
+  conditions?: string[];
   createdAt: Timestamp;
   updatedAt: Timestamp;
 }
@@ -31,4 +33,6 @@ export interface EntryFormData {
   content: string;
   tags?: string[];
   weather?: string;
+  mood?: number | null;
+  conditions?: string[];
 }

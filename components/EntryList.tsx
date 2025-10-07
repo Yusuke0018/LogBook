@@ -4,6 +4,7 @@ import { format } from 'date-fns';
 import { ja } from 'date-fns/locale';
 import { PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
 import type { Entry } from '@/lib/types';
+import { MOOD_EMOJI_MAP, MOOD_LABEL_MAP } from '@/lib/constants/entry';
 
 interface EntryListProps {
   entries: Entry[];
@@ -71,6 +72,26 @@ export default function EntryList({
           </p>
 
           <div className="flex flex-wrap gap-2 items-center">
+            {typeof entry.mood === 'number' && (
+              <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-accent-100 text-accent-800 dark:bg-accent-900/30 dark:text-accent-200">
+                <span className="text-base mr-1" aria-hidden>
+                  {MOOD_EMOJI_MAP[entry.mood] || '🙂'}
+                </span>
+                気分 {entry.mood} ({MOOD_LABEL_MAP[entry.mood] || '未設定'})
+              </span>
+            )}
+            {entry.conditions && entry.conditions.length > 0 && (
+              <div className="flex flex-wrap gap-1">
+                {entry.conditions.map((condition, index) => (
+                  <span
+                    key={`${condition}-${index}`}
+                    className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-secondary-100 text-secondary-800 dark:bg-secondary-900/30 dark:text-secondary-200"
+                  >
+                    {condition}
+                  </span>
+                ))}
+              </div>
+            )}
             {entry.tags && entry.tags.length > 0 && (
               <div className="flex flex-wrap gap-1">
                 {entry.tags.map((tag, index) => (
