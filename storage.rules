@@ -1,0 +1,18 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // ユーザーが認証されているかチェック
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // entriesフォルダ（ユーザーごとの画像）
+    match /entries/{userId}/{allPaths=**} {
+      // 自分のフォルダにのみ読み書き可能
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && request.auth.uid == userId
+        && request.resource.size < 5 * 1024 * 1024  // 5MB制限
+        && request.resource.contentType.matches('image/.*');  // 画像のみ
+    }
+  }
+}
