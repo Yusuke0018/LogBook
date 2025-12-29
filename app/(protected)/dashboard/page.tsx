@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/lib/hooks/useAuth';
 import {
@@ -199,6 +200,7 @@ const buildMoodTrend = (
 
 export default function DashboardPage() {
   const { user, signOut } = useAuth();
+  const searchParams = useSearchParams();
   const [entries, setEntries] = useState<Entry[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [filters, setFilters] = useState<FiltersState>(INITIAL_FILTERS);
@@ -211,6 +213,35 @@ export default function DashboardPage() {
     type: 'success' | 'error';
   }>({ show: false, message: '', type: 'success' });
   const [memos, setMemos] = useState<Memo[]>([]);
+  const [highlightedEntryId, setHighlightedEntryId] = useState<string | null>(null);
+
+  // Handle URL parameters from timeline
+  useEffect(() => {
+    const dateParam = searchParams.get('date');
+    const entryParam = searchParams.get('entry');
+
+    if (dateParam) {
+      const date = new Date(dateParam);
+      if (!isNaN(date.getTime())) {
+        setSelectedDate(date);
+      }
+    }
+
+    if (entryParam) {
+      setHighlightedEntryId(entryParam);
+      // Scroll to entry after a delay to allow rendering
+      setTimeout(() => {
+        const entryElement = document.getElementById(`entry-${entryParam}`);
+        if (entryElement) {
+          entryElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 500);
+      // Clear highlight after animation
+      setTimeout(() => {
+        setHighlightedEntryId(null);
+      }, 3000);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     if (user) {
@@ -706,6 +737,7 @@ export default function DashboardPage() {
                 entries={filteredEntries}
                 onEdit={handleEditEntry}
                 onDelete={handleDeleteEntry}
+                highlightedEntryId={highlightedEntryId}
               />
             </div>
 

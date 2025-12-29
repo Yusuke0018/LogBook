@@ -10,12 +10,14 @@ interface EntryListProps {
   entries: Entry[];
   onEdit?: (entry: Entry) => void;
   onDelete?: (entryId: string) => void;
+  highlightedEntryId?: string | null;
 }
 
 export default function EntryList({
   entries,
   onEdit,
   onDelete,
+  highlightedEntryId,
 }: EntryListProps) {
   if (entries.length === 0) {
     return (
@@ -27,10 +29,17 @@ export default function EntryList({
 
   return (
     <div className="space-y-4">
-      {entries.map((entry) => (
+      {entries.map((entry) => {
+        const isHighlighted = highlightedEntryId === entry.id;
+        return (
         <div
           key={entry.id}
-          className="card p-6 hover:shadow-soft-lg transition-shadow"
+          id={`entry-${entry.id}`}
+          className={`card p-6 transition-all ${
+            isHighlighted
+              ? 'ring-2 ring-primary-500 shadow-soft-lg animate-pulse'
+              : 'hover:shadow-soft-lg'
+          }`}
         >
           <div className="flex justify-between items-start mb-3">
             <div className="flex-1">
@@ -109,7 +118,8 @@ export default function EntryList({
             )}
           </div>
         </div>
-      ))}
+        );
+      })}
     </div>
   );
 }

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
+import Link from 'next/link';
 import { format, isSameDay, startOfDay } from 'date-fns';
 import { ja } from 'date-fns/locale';
 import { CalendarDaysIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
@@ -311,26 +312,30 @@ export default function TimelineView({ entries, className }: TimelineViewProps) 
                                           )}
                                         </div>
                                         <div className="space-y-1">
-                                          {dayGroup.entries.map((entry) => (
-                                            <div
-                                              key={entry.id}
-                                              className="text-xs p-1.5 rounded bg-gray-50 dark:bg-gray-900/50"
-                                            >
-                                              <div className="flex items-start justify-between gap-1">
-                                                <span className="font-medium text-gray-900 dark:text-white truncate">
-                                                  {entry.title || '無題'}
-                                                </span>
-                                                {typeof entry.mood === 'number' && (
-                                                  <span className="flex-shrink-0">
-                                                    {MOOD_EMOJI_MAP[entry.mood] || '🙂'}
+                                          {dayGroup.entries.map((entry) => {
+                                            const dateParam = format(entry.createdAt.toDate(), 'yyyy-MM-dd');
+                                            return (
+                                              <Link
+                                                key={entry.id}
+                                                href={`/dashboard?date=${dateParam}&entry=${entry.id}`}
+                                                className="block text-xs p-1.5 rounded bg-gray-50 dark:bg-gray-900/50 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:ring-1 hover:ring-primary-300 dark:hover:ring-primary-700 transition-all cursor-pointer"
+                                              >
+                                                <div className="flex items-start justify-between gap-1">
+                                                  <span className="font-medium text-gray-900 dark:text-white truncate">
+                                                    {entry.title || '無題'}
                                                   </span>
-                                                )}
-                                              </div>
-                                              <p className="text-gray-500 dark:text-gray-400 line-clamp-2 mt-0.5">
-                                                {buildSnippet(entry.content, 50)}
-                                              </p>
-                                            </div>
-                                          ))}
+                                                  {typeof entry.mood === 'number' && (
+                                                    <span className="flex-shrink-0">
+                                                      {MOOD_EMOJI_MAP[entry.mood] || '🙂'}
+                                                    </span>
+                                                  )}
+                                                </div>
+                                                <p className="text-gray-500 dark:text-gray-400 line-clamp-2 mt-0.5">
+                                                  {buildSnippet(entry.content, 50)}
+                                                </p>
+                                              </Link>
+                                            );
+                                          })}
                                         </div>
                                       </div>
                                     );
