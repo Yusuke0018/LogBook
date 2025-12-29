@@ -58,7 +58,7 @@ export default function TimelineView({ entries, className }: TimelineViewProps) 
   const currentYear = now.getFullYear();
   const startYear = currentYear - (rangeYears - 1);
   const today = useMemo(() => startOfDay(new Date()), []);
-  const rootClassName = `card p-8 animate-fade-in lg:flex lg:flex-col lg:min-h-0${
+  const rootClassName = `card p-6 animate-fade-in flex flex-col min-h-0${
     className ? ` ${className}` : ''
   }`;
 
@@ -166,7 +166,7 @@ export default function TimelineView({ entries, className }: TimelineViewProps) 
 
   return (
     <section className={rootClassName}>
-      <div className="flex flex-col gap-6 lg:flex-1 lg:min-h-0">
+      <div className="flex flex-col gap-4 flex-1 min-h-0">
         <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
           <div className="flex items-start gap-3">
             <div className="p-2.5 bg-gradient-to-br from-primary-100 to-secondary-100 dark:from-primary-900/30 dark:to-secondary-900/30 rounded-2xl">
@@ -243,13 +243,13 @@ export default function TimelineView({ entries, className }: TimelineViewProps) 
             表示期間に投稿がありません
           </div>
         ) : (
-          <div className="lg:flex-1 lg:min-h-0 lg:overflow-hidden">
-            <div className="space-y-12 lg:space-y-0 lg:flex lg:gap-10 lg:overflow-x-auto lg:overflow-y-hidden lg:pb-4 lg:pr-4 lg:h-full lg:snap-x lg:snap-mandatory">
+          <div className="flex-1 min-h-0 overflow-hidden">
+            <div className="space-y-12 lg:space-y-0 lg:flex lg:gap-8 lg:overflow-x-auto lg:overflow-y-hidden lg:pb-4 lg:h-full lg:snap-x lg:snap-mandatory scrollbar-thin">
               {timelineYears.map((yearGroup) => (
                 <section
                   key={yearGroup.year}
                   id={`timeline-year-${yearGroup.year}`}
-                  className="scroll-mt-28 lg:min-w-[360px] lg:max-w-[420px] lg:shrink-0 lg:h-full lg:overflow-y-auto lg:pr-2 lg:snap-start"
+                  className="scroll-mt-28 lg:min-w-[400px] lg:w-[400px] lg:shrink-0 lg:h-full lg:overflow-y-auto lg:snap-start scrollbar-thin"
                 >
                   <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
                     <div>
