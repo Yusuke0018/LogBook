@@ -46,5 +46,17 @@ service cloud.firestore {
       allow update, delete: if isAuthenticated() &&
         resource.data.userId == request.auth.uid;
     }
+
+    // memosコレクション（140文字メモ）
+    match /memos/{memoId} {
+      allow read, delete: if isAuthenticated() &&
+        resource.data.userId == request.auth.uid;
+
+      allow create: if isAuthenticated() &&
+        request.resource.data.userId == request.auth.uid &&
+        request.resource.data.content is string &&
+        request.resource.data.content.size() <= 140 &&
+        request.resource.data.createdAt is timestamp;
+    }
   }
 }

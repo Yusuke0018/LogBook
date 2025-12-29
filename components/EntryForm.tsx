@@ -1,15 +1,17 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { PaperAirplaneIcon } from '@heroicons/react/24/solid';
+import { useState, useEffect, useRef } from 'react';
+import { PaperAirplaneIcon, PhotoIcon, XMarkIcon } from '@heroicons/react/24/solid';
 import type { EntryFormData } from '@/lib/types';
 import { MOOD_SCALE } from '@/lib/constants/entry';
+import { uploadImage } from '@/lib/services/storage';
 
 interface EntryFormProps {
   onSubmit: (data: EntryFormData) => Promise<void>;
   initialData?: Partial<EntryFormData>;
   submitLabel?: string;
   onCancel?: () => void;
+  userId?: string;
 }
 
 export default function EntryForm({
@@ -17,6 +19,7 @@ export default function EntryForm({
   initialData,
   submitLabel = '投稿',
   onCancel,
+  userId,
 }: EntryFormProps) {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
@@ -24,6 +27,10 @@ export default function EntryForm({
   const [weather, setWeather] = useState('');
   const [mood, setMood] = useState<number | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [existingImageUrl, setExistingImageUrl] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // initialDataが変更されたときにフォームを更新
   useEffect(() => {
@@ -35,14 +42,42 @@ export default function EntryForm({
       setMood(
         typeof initialData.mood === 'number' ? initialData.mood : null
       );
+      setExistingImageUrl(initialData.imageUrl || null);
+      setImageFile(null);
+      setImagePreview(null);
     } else {
       setTitle('');
       setContent('');
       setTags('');
       setWeather('');
       setMood(null);
+      setExistingImageUrl(null);
+      setImageFile(null);
+      setImagePreview(null);
     }
   }, [initialData]);
+
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onload = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+      setExistingImageUrl(null);
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setImageFile(null);
+    setImagePreview(null);
+    setExistingImageUrl(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
 
   const handleMoodSelect = (value: number) => {
     setMood((prev) => (prev === value ? null : value));
@@ -54,6 +89,13 @@ export default function EntryForm({
 
     setIsSubmitting(true);
     try {
+      let imageUrl: string | undefined = existingImageUrl || undefined;
+
+      // 新しい画像がある場合はアップロード
+      if (imageFile && userId) {
+        imageUrl = await uploadImage(userId, imageFile);
+      }
+
       const data: EntryFormData = {
         title: title.trim() || undefined,
         content: content.trim(),
@@ -63,6 +105,7 @@ export default function EntryForm({
           .filter(Boolean),
         weather: weather.trim() || undefined,
         mood,
+        imageUrl,
       };
 
       await onSubmit(data);
@@ -74,6 +117,12 @@ export default function EntryForm({
         setTags('');
         setWeather('');
         setMood(null);
+        setImageFile(null);
+        setImagePreview(null);
+        setExistingImageUrl(null);
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+        }
       }
     } catch (error) {
       console.error('投稿エラー:', error);
@@ -89,7 +138,7 @@ export default function EntryForm({
           htmlFor="title"
           className="block text-sm font-semibold text-gray-700 dark:text-gray-300"
         >
-          タイトル<span className="text-gray-400 font-normal ml-1">(任意)</span>
+          今日のトピック<span className="text-gray-400 font-normal ml-1">(任意)</span>
         </label>
         <input
           type="text"
@@ -97,7 +146,7 @@ export default function EntryForm({
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           className="w-full px-4 py-3 bg-white/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:text-white transition-all placeholder:text-gray-400"
-          placeholder="タイトルを入力"
+          placeholder="今日のトピックを入力"
         />
       </div>
 
@@ -117,6 +166,48 @@ export default function EntryForm({
           className="w-full px-4 py-3 bg-white/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:text-white transition-all placeholder:text-gray-400 resize-none"
           placeholder="今日の出来事を記録..."
         />
+      </div>
+
+      {/* 画像アップロード */}
+      <div className="space-y-2">
+        <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
+          写真<span className="text-gray-400 font-normal ml-1">(任意)</span>
+        </label>
+        <div className="flex items-start gap-4">
+          <input
+            type="file"
+            ref={fileInputRef}
+            accept="image/*"
+            onChange={handleImageSelect}
+            className="hidden"
+            id="image-upload"
+          />
+          <label
+            htmlFor="image-upload"
+            className="flex items-center gap-2 px-4 py-2.5 bg-white/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-all"
+          >
+            <PhotoIcon className="h-5 w-5 text-gray-500" />
+            <span className="text-sm text-gray-600 dark:text-gray-300">
+              写真を選択
+            </span>
+          </label>
+          {(imagePreview || existingImageUrl) && (
+            <div className="relative">
+              <img
+                src={imagePreview || existingImageUrl || ''}
+                alt="プレビュー"
+                className="h-20 w-20 object-cover rounded-xl border border-gray-200 dark:border-gray-700"
+              />
+              <button
+                type="button"
+                onClick={handleRemoveImage}
+                className="absolute -top-2 -right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-all"
+              >
+                <XMarkIcon className="h-4 w-4" />
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

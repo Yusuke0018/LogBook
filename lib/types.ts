@@ -14,8 +14,20 @@ export interface Entry {
   tags?: string[];
   weather?: string;
   mood?: number | null;
+  imageUrl?: string;
   createdAt: Timestamp;
   updatedAt: Timestamp;
+}
+
+export interface Memo {
+  id: string;
+  userId: string;
+  content: string;
+  createdAt: Timestamp;
+}
+
+export interface MemoFormData {
+  content: string;
 }
 
 export interface EntryExport {
@@ -33,4 +45,5 @@ export interface EntryFormData {
   tags?: string[];
   weather?: string;
   mood?: number | null;
+  imageUrl?: string;
 }

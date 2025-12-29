@@ -10,6 +10,11 @@ import {
   getEntriesByDateRange,
   entryMatchesSearchTerm,
 } from '@/lib/services/entries';
+import {
+  createMemo,
+  deleteMemo,
+  getTodayMemos,
+} from '@/lib/services/memos';
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic';
@@ -41,13 +46,14 @@ import InsightsPanel, {
   SummaryItem,
   MoodTrendPoint,
 } from '@/components/InsightsPanel';
+import QuickMemo from '@/components/QuickMemo';
 import {
   ClipboardDocumentIcon,
   ArrowDownTrayIcon,
   ArrowRightOnRectangleIcon,
 } from '@heroicons/react/24/outline';
 import ThemeToggle from '@/components/ThemeToggle';
-import type { Entry, EntryFormData } from '@/lib/types';
+import type { Entry, EntryFormData, Memo } from '@/lib/types';
 
 type TrendPeriod = '7' | '30';
 
@@ -202,10 +208,12 @@ export default function DashboardPage() {
     message: string;
     type: 'success' | 'error';
   }>({ show: false, message: '', type: 'success' });
+  const [memos, setMemos] = useState<Memo[]>([]);
 
   useEffect(() => {
     if (user) {
       loadEntries();
+      loadMemos();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
@@ -218,6 +226,39 @@ export default function DashboardPage() {
     } catch (error) {
       console.error('エントリー読み込みエラー:', error);
       showToast('エントリーの読み込みに失敗しました', 'error');
+    }
+  };
+
+  const loadMemos = async () => {
+    if (!user) return;
+    try {
+      const data = await getTodayMemos(user.uid);
+      setMemos(data);
+    } catch (error) {
+      console.error('メモ読み込みエラー:', error);
+    }
+  };
+
+  const handleCreateMemo = async (content: string) => {
+    if (!user) return;
+    try {
+      await createMemo(user.uid, { content });
+      await loadMemos();
+      showToast('メモを追加しました');
+    } catch (error) {
+      console.error('メモ作成エラー:', error);
+      showToast('メモの作成に失敗しました', 'error');
+    }
+  };
+
+  const handleDeleteMemo = async (memoId: string) => {
+    try {
+      await deleteMemo(memoId);
+      await loadMemos();
+      showToast('メモを削除しました');
+    } catch (error) {
+      console.error('メモ削除エラー:', error);
+      showToast('メモの削除に失敗しました', 'error');
     }
   };
 
@@ -470,6 +511,7 @@ export default function DashboardPage() {
                 initialData={editingEntry || undefined}
                 submitLabel={editingEntry ? '更新' : '投稿'}
                 onCancel={editingEntry ? handleCancelEdit : undefined}
+                userId={user?.uid}
               />
             </div>
 
@@ -637,6 +679,12 @@ export default function DashboardPage() {
       />
 
       <Toast show={toast.show} message={toast.message} type={toast.type} />
+
+      <QuickMemo
+        memos={memos}
+        onSubmit={handleCreateMemo}
+        onDelete={handleDeleteMemo}
+      />
     </div>
   );
 }

@@ -32,6 +32,7 @@ export async function createEntry(
     tags: data.tags || [],
     weather: data.weather || '',
     mood: data.mood ?? null,
+    imageUrl: data.imageUrl || '',
     createdAt: now,
     updatedAt: now,
   };
@@ -69,6 +70,9 @@ export async function updateEntry(
   }
   if (data.mood !== undefined) {
     updateData.mood = data.mood;
+  }
+  if (data.imageUrl !== undefined) {
+    updateData.imageUrl = data.imageUrl;
   }
 
   await updateDoc(entryRef, updateData);

@@ -71,6 +71,16 @@ export default function EntryList({
             {entry.content}
           </p>
 
+          {entry.imageUrl && (
+            <div className="mb-3">
+              <img
+                src={entry.imageUrl}
+                alt="投稿画像"
+                className="max-w-full max-h-80 object-contain rounded-xl border border-gray-200 dark:border-gray-700"
+              />
+            </div>
+          )}
+
           <div className="flex flex-wrap gap-2 items-center">
             {typeof entry.mood === 'number' && (
               <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-accent-100 text-accent-800 dark:bg-accent-900/30 dark:text-accent-200">
