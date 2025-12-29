@@ -46,77 +46,47 @@ export default function TimelinePage() {
   return (
     <div className="h-screen bg-gradient-to-br from-primary-50 via-white to-secondary-50 dark:bg-gray-900 flex flex-col overflow-hidden">
       <header className="glass sticky top-0 z-10 shadow-sm">
-        <div className="container mx-auto px-6 py-5">
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <div className="flex flex-wrap items-center gap-4">
+        <div className="container mx-auto px-4 py-2">
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
               <Link
                 href="/dashboard"
-                className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-all rounded-button hover:bg-gray-50 dark:hover:bg-gray-800"
+                className="inline-flex items-center gap-1 px-2 py-1 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-all rounded-button hover:bg-gray-50 dark:hover:bg-gray-800"
               >
-                <ChevronLeftIcon className="h-5 w-5" />
-                ダッシュボード
+                <ChevronLeftIcon className="h-4 w-4" />
+                戻る
               </Link>
-              <div className="hidden sm:block h-6 w-px bg-gray-200 dark:bg-gray-700" />
-              <div>
-                <p className="text-2xl font-display font-bold text-gray-900 dark:text-white">
-                  年表
-                </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                  今日を振り返っての記録を年単位で俯瞰します
-                </p>
-              </div>
+              <div className="hidden sm:block h-5 w-px bg-gray-200 dark:bg-gray-700" />
+              <p className="text-lg font-display font-bold text-gray-900 dark:text-white">
+                年表
+              </p>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
               <ThemeToggle />
               <button
                 onClick={signOut}
-                className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-all rounded-button hover:bg-gray-50 dark:hover:bg-gray-800"
+                className="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-all rounded-button hover:bg-gray-50 dark:hover:bg-gray-800"
               >
-                <ArrowRightOnRectangleIcon className="h-5 w-5" />
-                ログアウト
+                <ArrowRightOnRectangleIcon className="h-4 w-4" />
+                <span className="hidden sm:inline">ログアウト</span>
               </button>
             </div>
           </div>
         </div>
       </header>
 
-      <main className="container mx-auto px-6 py-6 flex-1 flex flex-col min-h-0 overflow-hidden">
-        <div className="w-full flex-1 flex flex-col gap-4 min-h-0">
-          <div className="card p-6">
-            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-              <div>
-                <p className="text-lg font-semibold text-gray-900 dark:text-white">
-                  1年〜数年の流れを横断して見返す
-                </p>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  年表はPCで横スクロール、スマホでは縦に読みやすく並びます。
-                </p>
-              </div>
-              <div className="flex flex-wrap gap-2 text-xs">
-                <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-primary-50 text-primary-700 dark:bg-primary-900/30 dark:text-primary-200">
-                  投稿数 {entries.length}件
-                </span>
-                <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300">
-                  年ジャンプ対応
-                </span>
-              </div>
-            </div>
+      <main className="flex-1 flex flex-col min-h-0 overflow-hidden p-2">
+        {loading ? (
+          <div className="card h-full p-10 text-center text-gray-500 dark:text-gray-400">
+            読み込み中...
           </div>
-
-          <div className="flex-1 min-h-0 overflow-hidden">
-            {loading ? (
-              <div className="card h-full p-10 text-center text-gray-500 dark:text-gray-400">
-                読み込み中...
-              </div>
-            ) : errorMessage ? (
-              <div className="card h-full p-6 text-sm text-red-600 dark:text-red-400">
-                {errorMessage}
-              </div>
-            ) : (
-              <TimelineView entries={entries} className="h-full overflow-hidden" />
-            )}
+        ) : errorMessage ? (
+          <div className="card h-full p-6 text-sm text-red-600 dark:text-red-400">
+            {errorMessage}
           </div>
-        </div>
+        ) : (
+          <TimelineView entries={entries} className="h-full overflow-hidden" />
+        )}
       </main>
     </div>
   );

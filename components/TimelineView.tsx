@@ -46,7 +46,7 @@ export default function TimelineView({ entries, className }: TimelineViewProps) 
   const startYear = currentYear - (rangeYears - 1);
   const today = useMemo(() => startOfDay(new Date()), []);
 
-  const rootClassName = `card p-6 animate-fade-in flex flex-col min-h-0${
+  const rootClassName = `card p-3 animate-fade-in flex flex-col min-h-0${
     className ? ` ${className}` : ''
   }`;
 
@@ -155,65 +155,43 @@ export default function TimelineView({ entries, className }: TimelineViewProps) 
 
   return (
     <section className={rootClassName}>
-      <div className="flex flex-col gap-4 flex-1 min-h-0">
-        {/* Header */}
-        <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-          <div className="flex items-start gap-3">
-            <div className="p-2.5 bg-gradient-to-br from-primary-100 to-secondary-100 dark:from-primary-900/30 dark:to-secondary-900/30 rounded-2xl">
-              <CalendarDaysIcon className="h-6 w-6 text-primary-600 dark:text-primary-400" />
-            </div>
-            <div>
-              <h2 className="text-2xl font-display font-bold text-gray-900 dark:text-white">
-                年表で振り返る
-              </h2>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                左から右へ時間が流れます。横スクロールで移動できます。
-              </p>
-            </div>
-          </div>
-          <div className="flex flex-wrap items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-            <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-gray-100 dark:bg-gray-800">
-              {startYear} - {currentYear}
-            </span>
-            <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-primary-50 text-primary-700 dark:bg-primary-900/30 dark:text-primary-200">
-              {entriesInRange.length}件
+      <div className="flex flex-col gap-2 flex-1 min-h-0">
+        {/* Compact Controls */}
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <CalendarDaysIcon className="h-5 w-5 text-primary-600 dark:text-primary-400" />
+            <span className="text-sm font-semibold text-gray-900 dark:text-white">年表</span>
+            <span className="text-xs text-gray-500 dark:text-gray-400">
+              {startYear}-{currentYear} / {entriesInRange.length}件
             </span>
           </div>
-        </div>
-
-        {/* Controls */}
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex flex-wrap gap-2">
-            {RANGE_OPTIONS.map((option) => {
-              const isActive = rangeYears === option.value;
-              return (
-                <button
-                  key={option.value}
-                  type="button"
-                  onClick={() => setRangeYears(option.value)}
-                  className={
-                    isActive
-                      ? 'px-4 py-2 text-sm font-semibold text-white bg-gradient-to-r from-primary-500 to-secondary-500 rounded-full shadow-soft'
-                      : 'px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white/70 dark:bg-gray-800/70 border border-gray-200 dark:border-gray-700 rounded-full hover:border-primary-300 hover:text-primary-600 dark:hover:text-primary-300 transition'
-                  }
-                  aria-pressed={isActive}
-                >
-                  {option.label}
-                </button>
-              );
-            })}
-          </div>
-          <div className="flex flex-wrap items-center gap-3">
-            <label
-              htmlFor="timeline-year-jump"
-              className="text-sm font-medium text-gray-600 dark:text-gray-300"
-            >
-              年ジャンプ
-            </label>
+          <div className="flex items-center gap-2">
+            {/* Range buttons */}
+            <div className="flex gap-1">
+              {RANGE_OPTIONS.map((option) => {
+                const isActive = rangeYears === option.value;
+                return (
+                  <button
+                    key={option.value}
+                    type="button"
+                    onClick={() => setRangeYears(option.value)}
+                    className={
+                      isActive
+                        ? 'px-3 py-1 text-xs font-semibold text-white bg-gradient-to-r from-primary-500 to-secondary-500 rounded-full'
+                        : 'px-3 py-1 text-xs font-medium text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 rounded-full hover:text-primary-600 transition'
+                    }
+                    aria-pressed={isActive}
+                  >
+                    {option.label}
+                  </button>
+                );
+              })}
+            </div>
+            {/* Year jump */}
             <select
               id="timeline-year-jump"
               onChange={(event) => handleJumpToYear(Number(event.target.value))}
-              className="px-3 py-2 text-sm bg-white/70 dark:bg-gray-800/70 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              className="px-2 py-1 text-xs bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg"
             >
               {yearsInRange.map((year) => (
                 <option key={year} value={year}>
@@ -222,20 +200,20 @@ export default function TimelineView({ entries, className }: TimelineViewProps) 
               ))}
             </select>
             {/* Scroll buttons */}
-            <div className="hidden lg:flex items-center gap-1">
+            <div className="hidden lg:flex items-center">
               <button
                 onClick={() => handleScroll('left')}
-                className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition"
+                className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition"
                 aria-label="左へスクロール"
               >
-                <ChevronLeftIcon className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+                <ChevronLeftIcon className="h-4 w-4 text-gray-600 dark:text-gray-400" />
               </button>
               <button
                 onClick={() => handleScroll('right')}
-                className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition"
+                className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition"
                 aria-label="右へスクロール"
               >
-                <ChevronRightIcon className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+                <ChevronRightIcon className="h-4 w-4 text-gray-600 dark:text-gray-400" />
               </button>
             </div>
           </div>
@@ -265,14 +243,14 @@ export default function TimelineView({ entries, className }: TimelineViewProps) 
                       className="flex-shrink-0"
                     >
                       {/* Year Header */}
-                      <div className="sticky top-0 z-10 bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm border-b border-gray-200 dark:border-gray-700 px-4 py-2">
-                        <span className={`text-lg font-bold ${isCurrentYear ? 'text-primary-600 dark:text-primary-400' : 'text-gray-900 dark:text-white'}`}>
+                      <div className="sticky top-0 z-10 bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm border-b border-gray-200 dark:border-gray-700 px-3 py-1">
+                        <span className={`text-sm font-bold ${isCurrentYear ? 'text-primary-600 dark:text-primary-400' : 'text-gray-900 dark:text-white'}`}>
                           {year}年
                         </span>
                       </div>
 
                       {/* Months Row */}
-                      <div className="flex h-[calc(100%-44px)]">
+                      <div className="flex h-[calc(100%-28px)]">
                         {yearMonths.map((monthData) => {
                           const isCurrentMonth = monthData.year === currentYear && monthData.month === currentMonth;
 
@@ -285,18 +263,18 @@ export default function TimelineView({ entries, className }: TimelineViewProps) 
                               }`}
                             >
                               {/* Month Header */}
-                              <div className={`px-3 py-2 border-b border-gray-100 dark:border-gray-800 ${
+                              <div className={`px-2 py-1 border-b border-gray-100 dark:border-gray-800 ${
                                 isCurrentMonth ? 'bg-primary-100/50 dark:bg-primary-900/20' : 'bg-gray-50/50 dark:bg-gray-800/30'
                               }`}>
                                 <div className="flex items-center justify-between">
-                                  <span className={`text-sm font-semibold ${
+                                  <span className={`text-xs font-semibold ${
                                     isCurrentMonth ? 'text-primary-700 dark:text-primary-300' : 'text-gray-700 dark:text-gray-300'
                                   }`}>
                                     {monthData.month + 1}月
                                   </span>
                                   {monthData.entryCount > 0 && (
-                                    <span className="text-xs text-gray-500 dark:text-gray-400">
-                                      {monthData.entryCount}件
+                                    <span className="text-[10px] text-gray-500 dark:text-gray-400">
+                                      {monthData.entryCount}
                                     </span>
                                   )}
                                 </div>
