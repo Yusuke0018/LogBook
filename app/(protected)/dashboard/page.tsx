@@ -593,6 +593,47 @@ export default function DashboardPage() {
               </div>
             </div>
 
+            {/* Memos Section */}
+            {memos.length > 0 && (
+              <div className="card p-6 animate-fade-in">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="p-2 bg-gradient-to-br from-yellow-100 to-orange-100 dark:from-yellow-900/30 dark:to-orange-900/30 rounded-xl">
+                    <svg className="h-5 w-5 text-yellow-600 dark:text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                    今日のメモ
+                    <span className="ml-2 text-sm font-normal text-gray-500">({memos.length})</span>
+                  </h3>
+                </div>
+                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                  {memos.map((memo) => (
+                    <div
+                      key={memo.id}
+                      className="group relative p-4 bg-yellow-50/50 dark:bg-yellow-900/10 border border-yellow-200/50 dark:border-yellow-800/30 rounded-xl"
+                    >
+                      <p className="text-sm text-gray-700 dark:text-gray-200 break-words pr-6">
+                        {memo.content}
+                      </p>
+                      <p className="text-xs text-gray-400 mt-2">
+                        {format(memo.createdAt.toDate(), 'HH:mm', { locale: ja })}
+                      </p>
+                      <button
+                        onClick={() => handleDeleteMemo(memo.id)}
+                        className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 p-1 text-gray-400 hover:text-red-500 transition-all"
+                        title="削除"
+                      >
+                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Entries List Card */}
             <div className="card p-8 animate-slide-up">
               <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-6 mb-8">
