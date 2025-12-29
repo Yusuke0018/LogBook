@@ -47,6 +47,7 @@ import InsightsPanel, {
   MoodTrendPoint,
 } from '@/components/InsightsPanel';
 import QuickMemo from '@/components/QuickMemo';
+import TimelineView from '@/components/TimelineView';
 import {
   ClipboardDocumentIcon,
   ArrowDownTrayIcon,
@@ -699,6 +700,8 @@ export default function DashboardPage() {
                 onDelete={handleDeleteEntry}
               />
             </div>
+
+            <TimelineView entries={entries} />
           </div>
 
           {/* Sidebar */}
