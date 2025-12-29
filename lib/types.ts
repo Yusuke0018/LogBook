@@ -23,11 +23,13 @@ export interface Memo {
   id: string;
   userId: string;
   content: string;
+  imageUrl?: string;
   createdAt: Timestamp;
 }
 
 export interface MemoFormData {
   content: string;
+  imageUrl?: string;
 }
 
 export interface EntryExport {

@@ -239,10 +239,10 @@ export default function DashboardPage() {
     }
   };
 
-  const handleCreateMemo = async (content: string) => {
+  const handleCreateMemo = async (content: string, imageUrl?: string) => {
     if (!user) return;
     try {
-      await createMemo(user.uid, { content });
+      await createMemo(user.uid, { content, imageUrl });
       await loadMemos();
       showToast('メモを追加しました');
     } catch (error) {
@@ -503,7 +503,7 @@ export default function DashboardPage() {
                   </svg>
                 </div>
                 <h2 className="text-2xl font-display font-bold text-gray-900 dark:text-white">
-                  {editingEntry ? '投稿を編集' : '新しい投稿'}
+                  {editingEntry ? '投稿を編集' : '今日を振り返って'}
                 </h2>
               </div>
               <EntryForm
@@ -593,7 +593,7 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            {/* Memos Section */}
+            {/* Memos Section - 日々の断片 */}
             {memos.length > 0 && (
               <div className="card p-6 animate-fade-in">
                 <div className="flex items-center gap-3 mb-4">
@@ -603,7 +603,7 @@ export default function DashboardPage() {
                     </svg>
                   </div>
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                    今日のメモ
+                    日々の断片
                     <span className="ml-2 text-sm font-normal text-gray-500">({memos.length})</span>
                   </h3>
                 </div>
@@ -613,15 +613,24 @@ export default function DashboardPage() {
                       key={memo.id}
                       className="group relative p-4 bg-yellow-50/50 dark:bg-yellow-900/10 border border-yellow-200/50 dark:border-yellow-800/30 rounded-xl"
                     >
-                      <p className="text-sm text-gray-700 dark:text-gray-200 break-words pr-6">
-                        {memo.content}
-                      </p>
+                      {memo.imageUrl && (
+                        <img
+                          src={memo.imageUrl}
+                          alt=""
+                          className="w-full h-32 object-cover rounded-lg mb-3"
+                        />
+                      )}
+                      {memo.content && (
+                        <p className="text-sm text-gray-700 dark:text-gray-200 break-words pr-6">
+                          {memo.content}
+                        </p>
+                      )}
                       <p className="text-xs text-gray-400 mt-2">
                         {format(memo.createdAt.toDate(), 'HH:mm', { locale: ja })}
                       </p>
                       <button
                         onClick={() => handleDeleteMemo(memo.id)}
-                        className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 p-1 text-gray-400 hover:text-red-500 transition-all"
+                        className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 p-1 text-gray-400 hover:text-red-500 transition-all bg-white/80 dark:bg-gray-800/80 rounded-full"
                         title="削除"
                       >
                         <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -725,6 +734,7 @@ export default function DashboardPage() {
         memos={memos}
         onSubmit={handleCreateMemo}
         onDelete={handleDeleteMemo}
+        userId={user?.uid}
       />
     </div>
   );

@@ -23,7 +23,6 @@ export default function EntryForm({
 }: EntryFormProps) {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
-  const [tags, setTags] = useState('');
   const [weather, setWeather] = useState('');
   const [mood, setMood] = useState<number | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -37,7 +36,6 @@ export default function EntryForm({
     if (initialData) {
       setTitle(initialData.title || '');
       setContent(initialData.content || '');
-      setTags((initialData.tags || []).join(', '));
       setWeather(initialData.weather || '');
       setMood(
         typeof initialData.mood === 'number' ? initialData.mood : null
@@ -48,7 +46,6 @@ export default function EntryForm({
     } else {
       setTitle('');
       setContent('');
-      setTags('');
       setWeather('');
       setMood(null);
       setExistingImageUrl(null);
@@ -99,10 +96,6 @@ export default function EntryForm({
       const data: EntryFormData = {
         title: title.trim() || undefined,
         content: content.trim(),
-        tags: tags
-          .split(',')
-          .map((t) => t.trim())
-          .filter(Boolean),
         weather: weather.trim() || undefined,
         mood,
         imageUrl,
@@ -114,7 +107,6 @@ export default function EntryForm({
       if (!initialData) {
         setTitle('');
         setContent('');
-        setTags('');
         setWeather('');
         setMood(null);
         setImageFile(null);
@@ -210,40 +202,21 @@ export default function EntryForm({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <label
-            htmlFor="tags"
-            className="block text-sm font-semibold text-gray-700 dark:text-gray-300"
-          >
-            タグ
-          </label>
-          <input
-            type="text"
-            id="tags"
-            value={tags}
-            onChange={(e) => setTags(e.target.value)}
-            className="w-full px-4 py-3 bg-white/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:text-white transition-all placeholder:text-gray-400"
-            placeholder="仕事, プライベート"
-          />
-        </div>
-
-        <div className="space-y-2">
-          <label
-            htmlFor="weather"
-            className="block text-sm font-semibold text-gray-700 dark:text-gray-300"
-          >
-            天気
-          </label>
-          <input
-            type="text"
-            id="weather"
-            value={weather}
-            onChange={(e) => setWeather(e.target.value)}
-            className="w-full px-4 py-3 bg-white/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:text-white transition-all placeholder:text-gray-400"
-            placeholder="☀️ 晴れ / ☁️ 曇り / 🌧️ 雨"
-          />
-        </div>
+      <div className="space-y-2">
+        <label
+          htmlFor="weather"
+          className="block text-sm font-semibold text-gray-700 dark:text-gray-300"
+        >
+          天気
+        </label>
+        <input
+          type="text"
+          id="weather"
+          value={weather}
+          onChange={(e) => setWeather(e.target.value)}
+          className="w-full px-4 py-3 bg-white/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:text-white transition-all placeholder:text-gray-400"
+          placeholder="☀️ 晴れ / ☁️ 曇り / 🌧️ 雨"
+        />
       </div>
 
       <div className="space-y-2">

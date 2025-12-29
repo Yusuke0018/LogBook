@@ -27,6 +27,7 @@ export async function createMemo(
   const memoData = {
     userId,
     content: data.content.slice(0, 140), // 140文字制限
+    imageUrl: data.imageUrl || '',
     createdAt: now,
   };
 

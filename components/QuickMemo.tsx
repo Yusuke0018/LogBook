@@ -7,32 +7,40 @@ import {
   PlusIcon,
   XMarkIcon,
   PaperAirplaneIcon,
+  PhotoIcon,
 } from '@heroicons/react/24/solid';
 import { format } from 'date-fns';
 import { ja } from 'date-fns/locale';
 import type { Memo } from '@/lib/types';
+import { uploadImage } from '@/lib/services/storage';
 
 const MAX_LENGTH = 140;
 
 interface QuickMemoProps {
   memos: Memo[];
-  onSubmit: (content: string) => Promise<void>;
+  onSubmit: (content: string, imageUrl?: string) => Promise<void>;
   onDelete: (memoId: string) => Promise<void>;
+  userId?: string;
 }
 
 export default function QuickMemo({
   memos,
   onSubmit,
   onDelete,
+  userId,
 }: QuickMemoProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [content, setContent] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const remainingChars = MAX_LENGTH - content.length;
   const isOverLimit = remainingChars < 0;
-  const canSubmit = content.trim().length > 0 && !isOverLimit && !isSubmitting;
+  const hasContent = content.trim().length > 0 || imageFile !== null;
+  const canSubmit = hasContent && !isOverLimit && !isSubmitting;
 
   useEffect(() => {
     if (isOpen && textareaRef.current) {
@@ -40,13 +48,44 @@ export default function QuickMemo({
     }
   }, [isOpen]);
 
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onload = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setImageFile(null);
+    setImagePreview(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
   const handleSubmit = async () => {
     if (!canSubmit) return;
 
     setIsSubmitting(true);
     try {
-      await onSubmit(content.trim());
+      let imageUrl: string | undefined;
+
+      if (imageFile && userId) {
+        imageUrl = await uploadImage(userId, imageFile);
+      }
+
+      await onSubmit(content.trim(), imageUrl);
       setContent('');
+      setImageFile(null);
+      setImagePreview(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
       setIsOpen(false);
     } catch (error) {
       console.error('メモ投稿エラー:', error);
@@ -59,6 +98,16 @@ export default function QuickMemo({
     if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
       e.preventDefault();
       handleSubmit();
+    }
+  };
+
+  const handleClose = () => {
+    setIsOpen(false);
+    setContent('');
+    setImageFile(null);
+    setImagePreview(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
     }
   };
 
@@ -78,7 +127,7 @@ export default function QuickMemo({
         <Dialog
           as="div"
           className="relative z-50"
-          onClose={() => setIsOpen(false)}
+          onClose={handleClose}
         >
           <Transition.Child
             as={Fragment}
@@ -115,7 +164,7 @@ export default function QuickMemo({
                         📝 クイックメモ
                       </Dialog.Title>
                       <button
-                        onClick={() => setIsOpen(false)}
+                        onClick={handleClose}
                         className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 rounded-lg"
                       >
                         <XMarkIcon className="h-5 w-5" />
@@ -128,24 +177,60 @@ export default function QuickMemo({
                         value={content}
                         onChange={(e) => setContent(e.target.value)}
                         onKeyDown={handleKeyDown}
-                        rows={4}
+                        rows={3}
                         maxLength={MAX_LENGTH + 10}
                         className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border-0 rounded-xl text-gray-900 dark:text-white placeholder:text-gray-400 focus:ring-2 focus:ring-primary-500 resize-none text-base"
                         placeholder="今思ったことをメモ..."
                       />
 
+                      {/* 画像プレビュー */}
+                      {imagePreview && (
+                        <div className="relative inline-block">
+                          <img
+                            src={imagePreview}
+                            alt="プレビュー"
+                            className="h-24 w-24 object-cover rounded-xl border border-gray-200 dark:border-gray-700"
+                          />
+                          <button
+                            type="button"
+                            onClick={handleRemoveImage}
+                            className="absolute -top-2 -right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-all"
+                          >
+                            <XMarkIcon className="h-4 w-4" />
+                          </button>
+                        </div>
+                      )}
+
                       <div className="flex justify-between items-center">
-                        <span
-                          className={`text-sm font-medium ${
-                            isOverLimit
-                              ? 'text-red-500'
-                              : remainingChars <= 20
-                              ? 'text-yellow-500'
-                              : 'text-gray-400'
-                          }`}
-                        >
-                          残り {remainingChars} 文字
-                        </span>
+                        <div className="flex items-center gap-3">
+                          {/* 写真ボタン */}
+                          <input
+                            type="file"
+                            ref={fileInputRef}
+                            accept="image/*"
+                            onChange={handleImageSelect}
+                            className="hidden"
+                            id="memo-image-upload"
+                          />
+                          <label
+                            htmlFor="memo-image-upload"
+                            className="p-2 text-gray-400 hover:text-primary-500 cursor-pointer transition-all"
+                            title="写真を追加"
+                          >
+                            <PhotoIcon className="h-6 w-6" />
+                          </label>
+                          <span
+                            className={`text-sm font-medium ${
+                              isOverLimit
+                                ? 'text-red-500'
+                                : remainingChars <= 20
+                                ? 'text-yellow-500'
+                                : 'text-gray-400'
+                            }`}
+                          >
+                            {remainingChars}
+                          </span>
+                        </div>
                         <button
                           onClick={handleSubmit}
                           disabled={!canSubmit}
@@ -173,6 +258,13 @@ export default function QuickMemo({
                             key={memo.id}
                             className="group flex items-start gap-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl"
                           >
+                            {memo.imageUrl && (
+                              <img
+                                src={memo.imageUrl}
+                                alt=""
+                                className="h-12 w-12 object-cover rounded-lg flex-shrink-0"
+                              />
+                            )}
                             <div className="flex-1 min-w-0">
                               <p className="text-sm text-gray-700 dark:text-gray-200 break-words">
                                 {memo.content}
