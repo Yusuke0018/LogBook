@@ -5,10 +5,8 @@ import {
   doc,
   query,
   where,
-  orderBy,
   getDocs,
   Timestamp,
-  limit,
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase/config';
 import type { Memo, MemoFormData } from '@/lib/types';
@@ -52,18 +50,22 @@ export async function getMemosByUser(
     throw new Error('Firestore is not initialized');
   }
 
+  // シンプルなクエリでユーザーのメモを取得（インデックス不要）
   const q = query(
     collection(db, COLLECTION_NAME),
-    where('userId', '==', userId),
-    orderBy('createdAt', 'desc'),
-    limit(maxCount)
+    where('userId', '==', userId)
   );
 
   const querySnapshot = await getDocs(q);
-  return querySnapshot.docs.map((doc) => ({
+  const allMemos = querySnapshot.docs.map((doc) => ({
     id: doc.id,
     ...doc.data(),
   })) as Memo[];
+
+  // クライアント側で並べ替えて件数制限
+  return allMemos
+    .sort((a, b) => b.createdAt.toDate().getTime() - a.createdAt.toDate().getTime())
+    .slice(0, maxCount);
 }
 
 export async function getTodayMemos(userId: string): Promise<Memo[]> {
@@ -76,17 +78,23 @@ export async function getTodayMemos(userId: string): Promise<Memo[]> {
   const tomorrow = new Date(today);
   tomorrow.setDate(tomorrow.getDate() + 1);
 
+  // シンプルなクエリでユーザーのメモを取得（インデックス不要）
   const q = query(
     collection(db, COLLECTION_NAME),
-    where('userId', '==', userId),
-    where('createdAt', '>=', Timestamp.fromDate(today)),
-    where('createdAt', '<', Timestamp.fromDate(tomorrow)),
-    orderBy('createdAt', 'desc')
+    where('userId', '==', userId)
   );
 
   const querySnapshot = await getDocs(q);
-  return querySnapshot.docs.map((doc) => ({
+  const allMemos = querySnapshot.docs.map((doc) => ({
     id: doc.id,
     ...doc.data(),
   })) as Memo[];
+
+  // クライアント側で今日のメモをフィルタして並べ替え
+  return allMemos
+    .filter((memo) => {
+      const memoDate = memo.createdAt.toDate();
+      return memoDate >= today && memoDate < tomorrow;
+    })
+    .sort((a, b) => b.createdAt.toDate().getTime() - a.createdAt.toDate().getTime());
 }
