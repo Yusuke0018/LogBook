@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
+import Link from 'next/link';
 import { useAuth } from '@/lib/hooks/useAuth';
 import {
   createEntry,
@@ -47,10 +48,10 @@ import InsightsPanel, {
   MoodTrendPoint,
 } from '@/components/InsightsPanel';
 import QuickMemo from '@/components/QuickMemo';
-import TimelineView from '@/components/TimelineView';
 import {
   ClipboardDocumentIcon,
   ArrowDownTrayIcon,
+  CalendarDaysIcon,
   ArrowRightOnRectangleIcon,
 } from '@heroicons/react/24/outline';
 import ThemeToggle from '@/components/ThemeToggle';
@@ -478,6 +479,13 @@ export default function DashboardPage() {
               </h1>
             </div>
             <div className="flex items-center gap-3">
+              <Link
+                href="/timeline"
+                className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-all rounded-button hover:bg-gray-50 dark:hover:bg-gray-800"
+              >
+                <CalendarDaysIcon className="h-5 w-5" />
+                年表
+              </Link>
               <ThemeToggle />
               <button
                 onClick={signOut}
@@ -701,7 +709,6 @@ export default function DashboardPage() {
               />
             </div>
 
-            <TimelineView entries={entries} />
           </div>
 
           {/* Sidebar */}

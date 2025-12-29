@@ -226,17 +226,21 @@ export default function TimelineView({ entries }: TimelineViewProps) {
           </div>
         </div>
 
+        <p className="hidden lg:block text-xs text-gray-500 dark:text-gray-400">
+          PCでは横スクロールで年を移動できます。
+        </p>
+
         {entriesInRange.length === 0 ? (
           <div className="text-center py-12 text-gray-500 dark:text-gray-400">
             表示期間に投稿がありません
           </div>
         ) : (
-          <div className="space-y-12">
+          <div className="space-y-12 lg:space-y-0 lg:flex lg:gap-10 lg:overflow-x-auto lg:pb-4 lg:pr-4">
             {timelineYears.map((yearGroup) => (
               <section
                 key={yearGroup.year}
                 id={`timeline-year-${yearGroup.year}`}
-                className="scroll-mt-28"
+                className="scroll-mt-28 lg:min-w-[360px] lg:max-w-[420px] lg:shrink-0"
               >
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
                   <div>
