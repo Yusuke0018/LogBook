@@ -44,7 +44,7 @@ export default function TimelinePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-secondary-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-secondary-50 dark:bg-gray-900 flex flex-col">
       <header className="glass sticky top-0 z-10 shadow-sm">
         <div className="container mx-auto px-6 py-5">
           <div className="flex flex-wrap items-center justify-between gap-4">
@@ -80,8 +80,8 @@ export default function TimelinePage() {
         </div>
       </header>
 
-      <main className="container mx-auto px-6 py-10">
-        <div className="max-w-6xl mx-auto space-y-6">
+      <main className="container mx-auto px-6 py-10 flex-1 flex flex-col">
+        <div className="max-w-6xl mx-auto w-full flex-1 flex flex-col gap-6">
           <div className="card p-6">
             <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
               <div>
@@ -103,17 +103,19 @@ export default function TimelinePage() {
             </div>
           </div>
 
-          {loading ? (
-            <div className="card p-10 text-center text-gray-500 dark:text-gray-400">
-              読み込み中...
-            </div>
-          ) : errorMessage ? (
-            <div className="card p-6 text-sm text-red-600 dark:text-red-400">
-              {errorMessage}
-            </div>
-          ) : (
-            <TimelineView entries={entries} />
-          )}
+          <div className="flex-1 min-h-0">
+            {loading ? (
+              <div className="card h-full p-10 text-center text-gray-500 dark:text-gray-400">
+                読み込み中...
+              </div>
+            ) : errorMessage ? (
+              <div className="card h-full p-6 text-sm text-red-600 dark:text-red-400">
+                {errorMessage}
+              </div>
+            ) : (
+              <TimelineView entries={entries} className="h-full" />
+            )}
+          </div>
         </div>
       </main>
     </div>

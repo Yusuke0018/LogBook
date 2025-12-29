@@ -49,14 +49,18 @@ const summarizeTags = (tags?: string[]) => {
 
 interface TimelineViewProps {
   entries: Entry[];
+  className?: string;
 }
 
-export default function TimelineView({ entries }: TimelineViewProps) {
+export default function TimelineView({ entries, className }: TimelineViewProps) {
   const [rangeYears, setRangeYears] = useState<RangeOption>(1);
   const now = new Date();
   const currentYear = now.getFullYear();
   const startYear = currentYear - (rangeYears - 1);
   const today = useMemo(() => startOfDay(new Date()), []);
+  const rootClassName = `card p-8 animate-fade-in lg:flex lg:flex-col lg:min-h-0${
+    className ? ` ${className}` : ''
+  }`;
 
   const entriesInRange = useMemo(
     () =>
@@ -152,13 +156,17 @@ export default function TimelineView({ entries }: TimelineViewProps) {
     setJumpYear(year);
     const target = document.getElementById(`timeline-year-${year}`);
     if (target) {
-      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      target.scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest',
+        inline: 'start',
+      });
     }
   };
 
   return (
-    <section className="card p-8 animate-fade-in">
-      <div className="flex flex-col gap-6">
+    <section className={rootClassName}>
+      <div className="flex flex-col gap-6 lg:flex-1 lg:min-h-0">
         <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
           <div className="flex items-start gap-3">
             <div className="p-2.5 bg-gradient-to-br from-primary-100 to-secondary-100 dark:from-primary-900/30 dark:to-secondary-900/30 rounded-2xl">
@@ -235,163 +243,171 @@ export default function TimelineView({ entries }: TimelineViewProps) {
             表示期間に投稿がありません
           </div>
         ) : (
-          <div className="space-y-12 lg:space-y-0 lg:flex lg:gap-10 lg:overflow-x-auto lg:pb-4 lg:pr-4">
-            {timelineYears.map((yearGroup) => (
-              <section
-                key={yearGroup.year}
-                id={`timeline-year-${yearGroup.year}`}
-                className="scroll-mt-28 lg:min-w-[360px] lg:max-w-[420px] lg:shrink-0"
-              >
-                <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-                  <div>
-                    <p className="text-3xl font-display font-bold text-gray-900 dark:text-white">
-                      {yearGroup.year}
-                    </p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                      {yearGroup.entryCount}件の投稿
-                    </p>
+          <div className="lg:flex-1 lg:min-h-0 lg:overflow-hidden">
+            <div className="space-y-12 lg:space-y-0 lg:flex lg:gap-10 lg:overflow-x-auto lg:overflow-y-hidden lg:pb-4 lg:pr-4 lg:h-full lg:snap-x lg:snap-mandatory">
+              {timelineYears.map((yearGroup) => (
+                <section
+                  key={yearGroup.year}
+                  id={`timeline-year-${yearGroup.year}`}
+                  className="scroll-mt-28 lg:min-w-[360px] lg:max-w-[420px] lg:shrink-0 lg:h-full lg:overflow-y-auto lg:pr-2 lg:snap-start"
+                >
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+                    <div>
+                      <p className="text-3xl font-display font-bold text-gray-900 dark:text-white">
+                        {yearGroup.year}
+                      </p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                        {yearGroup.entryCount}件の投稿
+                      </p>
+                    </div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400">
+                      {yearGroup.months.length === 0
+                        ? 'この年の投稿はまだありません'
+                        : `${yearGroup.months.length}ヶ月分`}
+                    </div>
                   </div>
-                  <div className="text-xs text-gray-500 dark:text-gray-400">
-                    {yearGroup.months.length === 0
-                      ? 'この年の投稿はまだありません'
-                      : `${yearGroup.months.length}ヶ月分`}
-                  </div>
-                </div>
 
-                {yearGroup.months.length === 0 ? (
-                  <div className="mt-6 rounded-2xl border border-dashed border-gray-200 dark:border-gray-700 p-6 text-sm text-gray-500 dark:text-gray-400">
-                    まだこの年の記録がありません。次の振り返りで埋めていきましょう。
-                  </div>
-                ) : (
-                  <div className="mt-6 space-y-8">
-                    {yearGroup.months.map((monthGroup) => (
-                      <div
-                        key={`${yearGroup.year}-${monthGroup.month}`}
-                        className="relative pl-6 sm:pl-10"
-                      >
-                        <div className="absolute left-2 sm:left-3 top-0 bottom-0 w-px bg-gray-200 dark:bg-gray-700"></div>
-                        <div className="flex items-center gap-3 mb-4">
-                          <span className="text-sm font-semibold text-gray-700 dark:text-gray-200">
-                            {format(
-                              new Date(yearGroup.year, monthGroup.month, 1),
-                              'MM月',
-                              { locale: ja }
-                            )}
-                          </span>
-                          <span className="text-xs text-gray-500 dark:text-gray-400">
-                            {monthGroup.entryCount}件
-                          </span>
-                        </div>
-                        <div className="space-y-4">
-                          {monthGroup.days.map((dayGroup) => {
-                            const isToday = isSameDay(dayGroup.date, today);
-                            return (
-                              <div
-                                key={dayGroup.date.toISOString()}
-                                className="relative pl-6 sm:pl-8"
-                              >
-                                <span
-                                  className={
-                                    isToday
-                                      ? 'absolute left-1.5 sm:left-2.5 top-6 h-3 w-3 rounded-full bg-primary-500 ring-4 ring-primary-200 dark:ring-primary-900/40'
-                                      : 'absolute left-1.5 sm:left-2.5 top-6 h-3 w-3 rounded-full bg-gray-300 dark:bg-gray-600'
-                                  }
-                                ></span>
+                  {yearGroup.months.length === 0 ? (
+                    <div className="mt-6 rounded-2xl border border-dashed border-gray-200 dark:border-gray-700 p-6 text-sm text-gray-500 dark:text-gray-400">
+                      まだこの年の記録がありません。次の振り返りで埋めていきましょう。
+                    </div>
+                  ) : (
+                    <div className="mt-6 space-y-8">
+                      {yearGroup.months.map((monthGroup) => (
+                        <div
+                          key={`${yearGroup.year}-${monthGroup.month}`}
+                          className="relative pl-6 sm:pl-10"
+                        >
+                          <div className="absolute left-2 sm:left-3 top-0 bottom-0 w-px bg-gray-200 dark:bg-gray-700"></div>
+                          <div className="flex items-center gap-3 mb-4">
+                            <span className="text-sm font-semibold text-gray-700 dark:text-gray-200">
+                              {format(
+                                new Date(
+                                  yearGroup.year,
+                                  monthGroup.month,
+                                  1
+                                ),
+                                'MM月',
+                                { locale: ja }
+                              )}
+                            </span>
+                            <span className="text-xs text-gray-500 dark:text-gray-400">
+                              {monthGroup.entryCount}件
+                            </span>
+                          </div>
+                          <div className="space-y-4">
+                            {monthGroup.days.map((dayGroup) => {
+                              const isToday = isSameDay(dayGroup.date, today);
+                              return (
                                 <div
-                                  className={
-                                    isToday
-                                      ? 'rounded-2xl border border-primary-200 dark:border-primary-800 bg-primary-50/60 dark:bg-primary-900/20 p-5 shadow-soft'
-                                      : 'rounded-2xl border border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-900/30 p-5 shadow-soft'
-                                  }
+                                  key={dayGroup.date.toISOString()}
+                                  className="relative pl-6 sm:pl-8"
                                 >
-                                  <div className="flex flex-wrap items-center gap-3">
-                                    <p className="text-base font-semibold text-gray-900 dark:text-white">
-                                      {format(dayGroup.date, 'MM/dd (EEE)', {
-                                        locale: ja,
-                                      })}
-                                    </p>
-                                    {isToday && (
-                                      <span className="inline-flex items-center px-2 py-0.5 text-[11px] font-medium rounded-full bg-primary-500 text-white">
-                                        今日
+                                  <span
+                                    className={
+                                      isToday
+                                        ? 'absolute left-1.5 sm:left-2.5 top-6 h-3 w-3 rounded-full bg-primary-500 ring-4 ring-primary-200 dark:ring-primary-900/40'
+                                        : 'absolute left-1.5 sm:left-2.5 top-6 h-3 w-3 rounded-full bg-gray-300 dark:bg-gray-600'
+                                    }
+                                  ></span>
+                                  <div
+                                    className={
+                                      isToday
+                                        ? 'rounded-2xl border border-primary-200 dark:border-primary-800 bg-primary-50/60 dark:bg-primary-900/20 p-5 shadow-soft'
+                                        : 'rounded-2xl border border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-900/30 p-5 shadow-soft'
+                                    }
+                                  >
+                                    <div className="flex flex-wrap items-center gap-3">
+                                      <p className="text-base font-semibold text-gray-900 dark:text-white">
+                                        {format(dayGroup.date, 'MM/dd (EEE)', {
+                                          locale: ja,
+                                        })}
+                                      </p>
+                                      {isToday && (
+                                        <span className="inline-flex items-center px-2 py-0.5 text-[11px] font-medium rounded-full bg-primary-500 text-white">
+                                          今日
+                                        </span>
+                                      )}
+                                      <span className="text-xs text-gray-500 dark:text-gray-400">
+                                        {dayGroup.entries.length}件
                                       </span>
-                                    )}
-                                    <span className="text-xs text-gray-500 dark:text-gray-400">
-                                      {dayGroup.entries.length}件
-                                    </span>
-                                  </div>
+                                    </div>
 
-                                  <div className="mt-4 grid gap-3 md:grid-cols-2">
-                                    {dayGroup.entries.map((entry) => {
-                                      const tags = summarizeTags(entry.tags);
-                                      return (
-                                        <div
-                                          key={entry.id}
-                                          className="rounded-xl border border-gray-200/70 dark:border-gray-700/70 bg-white/90 dark:bg-gray-800/60 p-4"
-                                        >
-                                          <div className="flex items-start justify-between gap-3">
-                                            <div>
-                                              <p className="text-sm font-semibold text-gray-900 dark:text-white">
-                                                {entry.title || '無題'}
-                                              </p>
-                                              <p className="text-xs text-gray-500 dark:text-gray-400">
-                                                {format(
-                                                  entry.createdAt.toDate(),
-                                                  'HH:mm',
-                                                  { locale: ja }
-                                                )}
-                                              </p>
-                                            </div>
-                                            {typeof entry.mood === 'number' && (
-                                              <span className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium bg-accent-100 text-accent-700 dark:bg-accent-900/30 dark:text-accent-200 rounded-full">
-                                                <span aria-hidden>
-                                                  {MOOD_EMOJI_MAP[entry.mood] ||
-                                                    '🙂'}
+                                    <div className="mt-4 grid gap-3 md:grid-cols-2">
+                                      {dayGroup.entries.map((entry) => {
+                                        const tags = summarizeTags(entry.tags);
+                                        return (
+                                          <div
+                                            key={entry.id}
+                                            className="rounded-xl border border-gray-200/70 dark:border-gray-700/70 bg-white/90 dark:bg-gray-800/60 p-4"
+                                          >
+                                            <div className="flex items-start justify-between gap-3">
+                                              <div>
+                                                <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                                                  {entry.title || '無題'}
+                                                </p>
+                                                <p className="text-xs text-gray-500 dark:text-gray-400">
+                                                  {format(
+                                                    entry.createdAt.toDate(),
+                                                    'HH:mm',
+                                                    { locale: ja }
+                                                  )}
+                                                </p>
+                                              </div>
+                                              {typeof entry.mood === 'number' && (
+                                                <span className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium bg-accent-100 text-accent-700 dark:bg-accent-900/30 dark:text-accent-200 rounded-full">
+                                                  <span aria-hidden>
+                                                    {MOOD_EMOJI_MAP[
+                                                      entry.mood
+                                                    ] || '🙂'}
+                                                  </span>
+                                                  {MOOD_LABEL_MAP[
+                                                    entry.mood
+                                                  ] || entry.mood}
                                                 </span>
-                                                {MOOD_LABEL_MAP[entry.mood] ||
-                                                  entry.mood}
-                                              </span>
-                                            )}
-                                          </div>
+                                              )}
+                                            </div>
 
-                                          <p className="mt-2 text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
-                                            {buildSnippet(entry.content)}
-                                          </p>
+                                            <p className="mt-2 text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
+                                              {buildSnippet(entry.content)}
+                                            </p>
 
-                                          <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-                                            {tags.visible.map((tag) => (
-                                              <span
-                                                key={tag}
-                                                className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-primary-50 text-primary-700 dark:bg-primary-900/30 dark:text-primary-200"
-                                              >
-                                                {tag}
-                                              </span>
-                                            ))}
-                                            {tags.extraCount > 0 && (
-                                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-300">
-                                                +{tags.extraCount}
-                                              </span>
-                                            )}
-                                            {entry.weather && (
-                                              <span className="inline-flex items-center gap-1">
-                                                🌤️ {entry.weather}
-                                              </span>
-                                            )}
+                                            <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+                                              {tags.visible.map((tag) => (
+                                                <span
+                                                  key={tag}
+                                                  className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-primary-50 text-primary-700 dark:bg-primary-900/30 dark:text-primary-200"
+                                                >
+                                                  {tag}
+                                                </span>
+                                              ))}
+                                              {tags.extraCount > 0 && (
+                                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-300">
+                                                  +{tags.extraCount}
+                                                </span>
+                                              )}
+                                              {entry.weather && (
+                                                <span className="inline-flex items-center gap-1">
+                                                  🌤️ {entry.weather}
+                                                </span>
+                                              )}
+                                            </div>
                                           </div>
-                                        </div>
-                                      );
-                                    })}
+                                        );
+                                      })}
+                                    </div>
                                   </div>
                                 </div>
-                              </div>
-                            );
-                          })}
+                              );
+                            })}
+                          </div>
                         </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </section>
-            ))}
+                      ))}
+                    </div>
+                  )}
+                </section>
+              ))}
+            </div>
           </div>
         )}
       </div>
