@@ -15,7 +15,7 @@ import {
 import {
   createMemo,
   deleteMemo,
-  getTodayMemos,
+  getMemosByUser,
 } from '@/lib/services/memos';
 import { getUnreadLettersCount } from '@/lib/services/futureLetters';
 
@@ -26,6 +26,7 @@ import {
   entriesToCSV,
   downloadCSV,
   copyToClipboard,
+  memosToCSV,
 } from '@/lib/utils/export';
 import {
   format,
@@ -269,7 +270,7 @@ export default function DashboardPage() {
   const loadMemos = async () => {
     if (!user) return;
     try {
-      const data = await getTodayMemos(user.uid);
+      const data = await getMemosByUser(user.uid, 200);
       setMemos(data);
     } catch (error) {
       console.error('メモ読み込みエラー:', error);
@@ -662,47 +663,78 @@ export default function DashboardPage() {
             {/* Memos Section - 日々の断片 */}
             {memos.length > 0 && (
               <div className="card p-6 animate-fade-in">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="p-2 bg-gradient-to-br from-yellow-100 to-orange-100 dark:from-yellow-900/30 dark:to-orange-900/30 rounded-xl">
-                    <svg className="h-5 w-5 text-yellow-600 dark:text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                    </svg>
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-gradient-to-br from-yellow-100 to-orange-100 dark:from-yellow-900/30 dark:to-orange-900/30 rounded-xl">
+                      <svg className="h-5 w-5 text-yellow-600 dark:text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                      </svg>
+                    </div>
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                      日々の断片
+                      <span className="ml-2 text-sm font-normal text-gray-500">({memos.length})</span>
+                    </h3>
                   </div>
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                    日々の断片
-                    <span className="ml-2 text-sm font-normal text-gray-500">({memos.length})</span>
-                  </h3>
+                  <button
+                    onClick={() => {
+                      const csv = memosToCSV(memos);
+                      const filename = `logbook_memos_${format(new Date(), 'yyyyMMdd')}.csv`;
+                      downloadCSV(csv, filename);
+                      showToast('断片をCSVでダウンロードしました');
+                    }}
+                    className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-yellow-500 to-orange-500 rounded-button hover:shadow-soft-lg hover:from-yellow-600 hover:to-orange-600 transition-all"
+                    title="断片をCSVでエクスポート"
+                  >
+                    <ArrowDownTrayIcon className="h-4 w-4" />
+                    CSV
+                  </button>
                 </div>
-                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                  {memos.map((memo) => (
-                    <div
-                      key={memo.id}
-                      className="group relative p-4 bg-yellow-50/50 dark:bg-yellow-900/10 border border-yellow-200/50 dark:border-yellow-800/30 rounded-xl"
-                    >
-                      {memo.imageUrl && (
-                        <img
-                          src={memo.imageUrl}
-                          alt=""
-                          className="w-full h-32 object-cover rounded-lg mb-3"
-                        />
-                      )}
-                      {memo.content && (
-                        <p className="text-sm text-gray-700 dark:text-gray-200 break-words pr-6">
-                          {memo.content}
-                        </p>
-                      )}
-                      <p className="text-xs text-gray-400 mt-2">
-                        {format(memo.createdAt.toDate(), 'HH:mm', { locale: ja })}
-                      </p>
-                      <button
-                        onClick={() => handleDeleteMemo(memo.id)}
-                        className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 p-1 text-gray-400 hover:text-red-500 transition-all bg-white/80 dark:bg-gray-800/80 rounded-full"
-                        title="削除"
-                      >
-                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                      </button>
+                <div className="space-y-6">
+                  {Object.entries(
+                    memos.reduce((groups, memo) => {
+                      const dateKey = format(memo.createdAt.toDate(), 'yyyy-MM-dd');
+                      if (!groups[dateKey]) groups[dateKey] = [];
+                      groups[dateKey].push(memo);
+                      return groups;
+                    }, {} as Record<string, typeof memos>)
+                  ).map(([dateKey, dayMemos]) => (
+                    <div key={dateKey}>
+                      <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-3">
+                        {format(new Date(dateKey), 'yyyy年MM月dd日 (EEE)', { locale: ja })}
+                      </h4>
+                      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                        {dayMemos.map((memo) => (
+                          <div
+                            key={memo.id}
+                            className="group relative p-4 bg-yellow-50/50 dark:bg-yellow-900/10 border border-yellow-200/50 dark:border-yellow-800/30 rounded-xl"
+                          >
+                            {memo.imageUrl && (
+                              <img
+                                src={memo.imageUrl}
+                                alt=""
+                                className="w-full h-32 object-cover rounded-lg mb-3"
+                              />
+                            )}
+                            {memo.content && (
+                              <p className="text-sm text-gray-700 dark:text-gray-200 break-words pr-6">
+                                {memo.content}
+                              </p>
+                            )}
+                            <p className="text-xs text-gray-400 mt-2">
+                              {format(memo.createdAt.toDate(), 'HH:mm', { locale: ja })}
+                            </p>
+                            <button
+                              onClick={() => handleDeleteMemo(memo.id)}
+                              className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 p-1 text-gray-400 hover:text-red-500 transition-all bg-white/80 dark:bg-gray-800/80 rounded-full"
+                              title="削除"
+                            >
+                              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                              </svg>
+                            </button>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   ))}
                 </div>

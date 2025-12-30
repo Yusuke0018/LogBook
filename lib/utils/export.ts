@@ -1,6 +1,6 @@
 import { format } from 'date-fns';
 import { ja } from 'date-fns/locale';
-import type { Entry } from '@/lib/types';
+import type { Entry, Memo } from '@/lib/types';
 
 export function entriesToText(entries: Entry[]): string {
   return entries
@@ -57,4 +57,28 @@ export async function copyToClipboard(text: string): Promise<void> {
     console.error('クリップボードコピーエラー:', error);
     throw error;
   }
+}
+
+export function memosToCSV(memos: Memo[]): string {
+  const headers = ['日時', '内容', '画像URL'];
+  const rows = memos.map((memo) => {
+    const date = memo.createdAt.toDate();
+    const dateStr = format(date, 'yyyy-MM-dd HH:mm:ss', { locale: ja });
+    const content = `"${memo.content.replace(/"/g, '""')}"`;
+    const imageUrl = memo.imageUrl || '';
+    return [dateStr, content, imageUrl].join(',');
+  });
+
+  return [headers.join(','), ...rows].join('\n');
+}
+
+export function memosToText(memos: Memo[]): string {
+  return memos
+    .map((memo) => {
+      const date = memo.createdAt.toDate();
+      const dateStr = format(date, 'yyyy/MM/dd HH:mm', { locale: ja });
+      const imageText = memo.imageUrl ? ' [画像あり]' : '';
+      return `${dateStr}${imageText}\n${memo.content}`;
+    })
+    .join('\n\n---\n\n');
 }
