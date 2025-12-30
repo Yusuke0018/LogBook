@@ -10,7 +10,6 @@ interface FutureLetterListProps {
   pendingLetters: FutureLetter[];
   onOpen: (letterId: string) => Promise<void>;
   onDelete: (letterId: string) => Promise<void>;
-  debugMode?: boolean;
 }
 
 const PERIOD_LABELS: Record<string, { label: string; emoji: string }> = {
@@ -32,13 +31,11 @@ function LetterCard({
   isDelivered,
   onOpen,
   onDelete,
-  debugMode = false,
 }: {
   letter: FutureLetter;
   isDelivered: boolean;
   onOpen: (letterId: string) => Promise<void>;
   onDelete: (letterId: string) => Promise<void>;
-  debugMode?: boolean;
 }) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -64,13 +61,13 @@ function LetterCard({
   };
 
   // 未配達の手紙
-  if (!isDelivered && !debugMode) {
+  if (!isDelivered) {
     return (
       <div className="p-5 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-200 dark:border-gray-700">
         <div className="flex items-center gap-3 mb-3">
           <ClockIcon className="h-6 w-6 text-gray-400" />
           <span className="text-sm text-gray-500 dark:text-gray-400">
-            {formatDate(letter.deliveryDate)} に届きます
+            配達待ち
           </span>
         </div>
         <div className="flex items-center gap-2">
@@ -78,44 +75,7 @@ function LetterCard({
           <span className="text-sm text-gray-600 dark:text-gray-300">{periodInfo.label}</span>
         </div>
         <p className="text-sm text-gray-400 dark:text-gray-500 mt-2 italic">
-          内容は届くまでお楽しみ...
-        </p>
-      </div>
-    );
-  }
-
-  // デバッグモード：未配達でも内容を表示
-  if (!isDelivered && debugMode) {
-    return (
-      <div className="p-5 bg-yellow-50 dark:bg-yellow-900/20 rounded-xl border-2 border-dashed border-yellow-400 dark:border-yellow-600">
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2">
-            <span className="px-2 py-0.5 bg-yellow-400 text-yellow-900 text-xs font-bold rounded">DEBUG</span>
-            <ClockIcon className="h-5 w-5 text-yellow-600" />
-            <span className="text-sm text-yellow-700 dark:text-yellow-400">
-              {formatDate(letter.deliveryDate)} に届く予定
-            </span>
-          </div>
-          <button
-            onClick={handleDelete}
-            disabled={isDeleting}
-            className="p-1.5 text-gray-400 hover:text-red-500 transition-colors disabled:opacity-50"
-          >
-            <TrashIcon className="h-4 w-4" />
-          </button>
-        </div>
-        <div className="flex items-center gap-2 mb-2">
-          <span className="text-lg">{periodInfo.emoji}</span>
-          <span className="text-sm text-gray-600 dark:text-gray-300">{periodInfo.label}</span>
-        </div>
-        <h3 className="font-semibold text-gray-800 dark:text-gray-200 mb-2">
-          {letter.title}
-        </h3>
-        <p className="text-sm text-gray-600 dark:text-gray-300 whitespace-pre-wrap">
-          {letter.content}
-        </p>
-        <p className="text-xs text-gray-400 mt-3">
-          作成日: {formatDate(letter.createdAt)}
+          届くまでお楽しみ...
         </p>
       </div>
     );
@@ -189,7 +149,6 @@ export default function FutureLetterList({
   pendingLetters,
   onOpen,
   onDelete,
-  debugMode = false,
 }: FutureLetterListProps) {
   const unopenedCount = deliveredLetters.filter(l => !l.isOpened).length;
 
@@ -222,7 +181,6 @@ export default function FutureLetterList({
                 isDelivered={true}
                 onOpen={onOpen}
                 onDelete={onDelete}
-                debugMode={debugMode}
               />
             ))}
           </div>
@@ -236,11 +194,6 @@ export default function FutureLetterList({
             <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
               配達待ち ({pendingLetters.length}通)
             </h2>
-            {debugMode && (
-              <span className="px-2 py-0.5 bg-yellow-400 text-yellow-900 text-xs font-bold rounded">
-                内容表示中
-              </span>
-            )}
           </div>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {pendingLetters.map((letter) => (
@@ -250,7 +203,6 @@ export default function FutureLetterList({
                 isDelivered={false}
                 onOpen={onOpen}
                 onDelete={onDelete}
-                debugMode={debugMode}
               />
             ))}
           </div>

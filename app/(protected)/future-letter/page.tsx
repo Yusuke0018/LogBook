@@ -18,7 +18,6 @@ import {
   ArrowLeftIcon,
   EnvelopeIcon,
   PencilSquareIcon,
-  BugAntIcon,
 } from '@heroicons/react/24/outline';
 import type { FutureLetter, FutureLetterFormData } from '@/lib/types';
 
@@ -37,7 +36,6 @@ export default function FutureLetterPage() {
     message: string;
     type: 'success' | 'error';
   }>({ show: false, message: '', type: 'success' });
-  const [debugMode, setDebugMode] = useState(false);
 
   const unopenedCount = deliveredLetters.filter(l => !l.isOpened).length;
 
@@ -126,20 +124,7 @@ export default function FutureLetterPage() {
                 </h1>
               </div>
             </div>
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => setDebugMode(!debugMode)}
-                className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
-                  debugMode
-                    ? 'bg-yellow-400 text-yellow-900'
-                    : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
-                }`}
-              >
-                <BugAntIcon className="h-4 w-4" />
-                {debugMode ? 'DEBUG ON' : 'DEBUG'}
-              </button>
-              <ThemeToggle />
-            </div>
+            <ThemeToggle />
           </div>
         </div>
       </header>
@@ -206,7 +191,6 @@ export default function FutureLetterPage() {
                 pendingLetters={pendingLetters}
                 onOpen={handleOpenLetter}
                 onDelete={handleDeleteLetter}
-                debugMode={debugMode}
               />
             )}
           </div>
