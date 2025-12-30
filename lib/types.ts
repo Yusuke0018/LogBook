@@ -49,3 +49,24 @@ export interface EntryFormData {
   mood?: number | null;
   imageUrl?: string;
 }
+
+// 未来への手紙
+export type LetterPeriod = 'short' | 'medium' | 'long';
+
+export interface FutureLetter {
+  id: string;
+  userId: string;
+  title: string;
+  content: string;
+  period: LetterPeriod;
+  deliveryDate: Timestamp;
+  isOpened: boolean;
+  openedAt?: Timestamp;
+  createdAt: Timestamp;
+}
+
+export interface FutureLetterFormData {
+  title: string;
+  content: string;
+  period: LetterPeriod;
+}

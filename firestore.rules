@@ -58,5 +58,26 @@ service cloud.firestore {
         request.resource.data.content.size() <= 140 &&
         request.resource.data.createdAt is timestamp;
     }
+
+    // futureLettersコレクション（未来への手紙）
+    match /futureLetters/{letterId} {
+      allow read: if isAuthenticated() &&
+        resource.data.userId == request.auth.uid;
+
+      allow create: if isAuthenticated() &&
+        request.resource.data.userId == request.auth.uid &&
+        request.resource.data.title is string &&
+        request.resource.data.content is string &&
+        request.resource.data.period in ['short', 'medium', 'long'] &&
+        request.resource.data.deliveryDate is timestamp &&
+        request.resource.data.createdAt is timestamp;
+
+      allow update: if isAuthenticated() &&
+        resource.data.userId == request.auth.uid &&
+        request.resource.data.userId == request.auth.uid;
+
+      allow delete: if isAuthenticated() &&
+        resource.data.userId == request.auth.uid;
+    }
   }
 }

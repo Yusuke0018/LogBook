@@ -54,6 +54,7 @@ import {
   ArrowDownTrayIcon,
   CalendarDaysIcon,
   ArrowRightOnRectangleIcon,
+  EnvelopeIcon,
 } from '@heroicons/react/24/outline';
 import ThemeToggle from '@/components/ThemeToggle';
 import type { Entry, EntryFormData, Memo } from '@/lib/types';
@@ -510,6 +511,13 @@ export default function DashboardPage() {
               </h1>
             </div>
             <div className="flex items-center gap-3">
+              <Link
+                href="/future-letter"
+                className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-all rounded-button hover:bg-gray-50 dark:hover:bg-gray-800"
+              >
+                <EnvelopeIcon className="h-5 w-5" />
+                未来への手紙
+              </Link>
               <Link
                 href="/timeline"
                 className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-all rounded-button hover:bg-gray-50 dark:hover:bg-gray-800"
