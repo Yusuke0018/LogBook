@@ -17,6 +17,7 @@ import {
   deleteMemo,
   getTodayMemos,
 } from '@/lib/services/memos';
+import { getUnreadLettersCount } from '@/lib/services/futureLetters';
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic';
@@ -215,6 +216,7 @@ export default function DashboardPage() {
   }>({ show: false, message: '', type: 'success' });
   const [memos, setMemos] = useState<Memo[]>([]);
   const [highlightedEntryId, setHighlightedEntryId] = useState<string | null>(null);
+  const [unreadLettersCount, setUnreadLettersCount] = useState(0);
 
   // Handle URL parameters from timeline
   useEffect(() => {
@@ -248,6 +250,7 @@ export default function DashboardPage() {
     if (user) {
       loadEntries();
       loadMemos();
+      loadUnreadLettersCount();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
@@ -270,6 +273,16 @@ export default function DashboardPage() {
       setMemos(data);
     } catch (error) {
       console.error('メモ読み込みエラー:', error);
+    }
+  };
+
+  const loadUnreadLettersCount = async () => {
+    if (!user) return;
+    try {
+      const count = await getUnreadLettersCount(user.uid);
+      setUnreadLettersCount(count);
+    } catch (error) {
+      console.error('未読手紙数取得エラー:', error);
     }
   };
 
@@ -513,10 +526,15 @@ export default function DashboardPage() {
             <div className="flex items-center gap-3">
               <Link
                 href="/future-letter"
-                className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-all rounded-button hover:bg-gray-50 dark:hover:bg-gray-800"
+                className="relative inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-all rounded-button hover:bg-gray-50 dark:hover:bg-gray-800"
               >
                 <EnvelopeIcon className="h-5 w-5" />
                 未来への手紙
+                {unreadLettersCount > 0 && (
+                  <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white animate-pulse">
+                    {unreadLettersCount}
+                  </span>
+                )}
               </Link>
               <Link
                 href="/timeline"
