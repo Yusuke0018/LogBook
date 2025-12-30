@@ -41,7 +41,7 @@ import {
 } from 'date-fns';
 import { ja } from 'date-fns/locale';
 import EntryForm from '@/components/EntryForm';
-import EntryList from '@/components/EntryList';
+import UnifiedList, { UnifiedItem } from '@/components/UnifiedList';
 import Calendar from '@/components/Calendar';
 import ExportModal from '@/components/ExportModal';
 import Toast from '@/components/Toast';
@@ -388,6 +388,46 @@ export default function DashboardPage() {
     [entries, selectedDate, filters]
   );
 
+  const filteredMemos = useMemo(() => {
+    return memos.filter((memo) => {
+      const memoDate = memo.createdAt.toDate();
+
+      if (selectedDate && !isSameDay(memoDate, selectedDate)) {
+        return false;
+      }
+
+      if (filters.startDate) {
+        const start = startOfDay(new Date(filters.startDate));
+        if (memoDate < start) return false;
+      }
+
+      if (filters.endDate) {
+        const end = endOfDay(new Date(filters.endDate));
+        if (memoDate > end) return false;
+      }
+
+      if (filters.searchTerm.trim()) {
+        if (!memo.content.toLowerCase().includes(filters.searchTerm.toLowerCase())) {
+          return false;
+        }
+      }
+
+      return true;
+    });
+  }, [memos, selectedDate, filters]);
+
+  const unifiedItems: UnifiedItem[] = useMemo(() => {
+    const items: UnifiedItem[] = [
+      ...filteredEntries.map((entry) => ({ type: 'entry' as const, data: entry })),
+      ...filteredMemos.map((memo) => ({ type: 'memo' as const, data: memo })),
+    ];
+    return items.sort((a, b) => {
+      const dateA = a.data.createdAt.toDate().getTime();
+      const dateB = b.data.createdAt.toDate().getTime();
+      return dateB - dateA;
+    });
+  }, [filteredEntries, filteredMemos]);
+
   const filtersActive =
     Boolean(filters.searchTerm.trim()) ||
     Boolean(filters.startDate) ||
@@ -470,8 +510,8 @@ export default function DashboardPage() {
   const listTitle = selectedDate
     ? format(selectedDate, 'yyyy年MM月dd日', { locale: ja })
     : filtersActive
-    ? '条件に一致する投稿'
-    : 'すべての投稿';
+    ? '条件に一致する記録'
+    : 'すべての記録';
 
   const isFilteredView = filtersActive || Boolean(selectedDate);
 
@@ -660,88 +700,7 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            {/* Memos Section - 日々の断片 */}
-            {memos.length > 0 && (
-              <div className="card p-6 animate-fade-in">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-gradient-to-br from-yellow-100 to-orange-100 dark:from-yellow-900/30 dark:to-orange-900/30 rounded-xl">
-                      <svg className="h-5 w-5 text-yellow-600 dark:text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                      </svg>
-                    </div>
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                      日々の断片
-                      <span className="ml-2 text-sm font-normal text-gray-500">({memos.length})</span>
-                    </h3>
-                  </div>
-                  <button
-                    onClick={() => {
-                      const csv = memosToCSV(memos);
-                      const filename = `logbook_memos_${format(new Date(), 'yyyyMMdd')}.csv`;
-                      downloadCSV(csv, filename);
-                      showToast('断片をCSVでダウンロードしました');
-                    }}
-                    className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-yellow-500 to-orange-500 rounded-button hover:shadow-soft-lg hover:from-yellow-600 hover:to-orange-600 transition-all"
-                    title="断片をCSVでエクスポート"
-                  >
-                    <ArrowDownTrayIcon className="h-4 w-4" />
-                    CSV
-                  </button>
-                </div>
-                <div className="space-y-6">
-                  {Object.entries(
-                    memos.reduce((groups, memo) => {
-                      const dateKey = format(memo.createdAt.toDate(), 'yyyy-MM-dd');
-                      if (!groups[dateKey]) groups[dateKey] = [];
-                      groups[dateKey].push(memo);
-                      return groups;
-                    }, {} as Record<string, typeof memos>)
-                  ).map(([dateKey, dayMemos]) => (
-                    <div key={dateKey}>
-                      <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-3">
-                        {format(new Date(dateKey), 'yyyy年MM月dd日 (EEE)', { locale: ja })}
-                      </h4>
-                      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                        {dayMemos.map((memo) => (
-                          <div
-                            key={memo.id}
-                            className="group relative p-4 bg-yellow-50/50 dark:bg-yellow-900/10 border border-yellow-200/50 dark:border-yellow-800/30 rounded-xl"
-                          >
-                            {memo.imageUrl && (
-                              <img
-                                src={memo.imageUrl}
-                                alt=""
-                                className="w-full h-32 object-cover rounded-lg mb-3"
-                              />
-                            )}
-                            {memo.content && (
-                              <p className="text-sm text-gray-700 dark:text-gray-200 break-words pr-6">
-                                {memo.content}
-                              </p>
-                            )}
-                            <p className="text-xs text-gray-400 mt-2">
-                              {format(memo.createdAt.toDate(), 'HH:mm', { locale: ja })}
-                            </p>
-                            <button
-                              onClick={() => handleDeleteMemo(memo.id)}
-                              className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 p-1 text-gray-400 hover:text-red-500 transition-all bg-white/80 dark:bg-gray-800/80 rounded-full"
-                              title="削除"
-                            >
-                              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                              </svg>
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Entries List Card */}
+            {/* Unified List Card - 投稿と断片を時間順に表示 */}
             <div className="card p-8 animate-slide-up">
               <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-6 mb-8">
                 <div className="flex items-center gap-3">
@@ -762,10 +721,13 @@ export default function DashboardPage() {
                       )}
                     </div>
                     <p className="text-sm text-gray-600 dark:text-gray-400 mt-0.5">
-                      {filteredEntries.length}件の投稿
+                      {unifiedItems.length}件の記録
+                      <span className="ml-1 text-gray-400 dark:text-gray-500">
+                        (投稿 {filteredEntries.length} / 断片 {filteredMemos.length})
+                      </span>
                       {isFilteredView && (
                         <span className="ml-1 text-gray-400 dark:text-gray-500">
-                          / 全{entries.length}件
+                          / 全{entries.length + memos.length}件
                         </span>
                       )}
                     </p>
@@ -782,19 +744,34 @@ export default function DashboardPage() {
                     <span className="hidden sm:inline">コピー</span>
                   </button>
                   <button
-                    onClick={() => setIsExportModalOpen(true)}
-                    className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-gradient-to-r from-primary-500 to-secondary-500 rounded-button hover:shadow-soft-lg hover:from-primary-600 hover:to-secondary-600 transition-all"
-                    title="CSVエクスポート"
+                    onClick={() => {
+                      const csv = memosToCSV(memos);
+                      const filename = `logbook_memos_${format(new Date(), 'yyyyMMdd')}.csv`;
+                      downloadCSV(csv, filename);
+                      showToast('断片をCSVでダウンロードしました');
+                    }}
+                    disabled={memos.length === 0}
+                    className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-white bg-gradient-to-r from-yellow-500 to-orange-500 rounded-button hover:shadow-soft-lg hover:from-yellow-600 hover:to-orange-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    title="断片をCSVでエクスポート"
                   >
                     <ArrowDownTrayIcon className="h-5 w-5" />
-                    <span className="hidden sm:inline">CSV</span>
+                    <span className="hidden sm:inline">断片CSV</span>
+                  </button>
+                  <button
+                    onClick={() => setIsExportModalOpen(true)}
+                    className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-gradient-to-r from-primary-500 to-secondary-500 rounded-button hover:shadow-soft-lg hover:from-primary-600 hover:to-secondary-600 transition-all"
+                    title="投稿をCSVエクスポート"
+                  >
+                    <ArrowDownTrayIcon className="h-5 w-5" />
+                    <span className="hidden sm:inline">投稿CSV</span>
                   </button>
                 </div>
               </div>
-              <EntryList
-                entries={filteredEntries}
-                onEdit={handleEditEntry}
-                onDelete={handleDeleteEntry}
+              <UnifiedList
+                items={unifiedItems}
+                onEditEntry={handleEditEntry}
+                onDeleteEntry={handleDeleteEntry}
+                onDeleteMemo={handleDeleteMemo}
                 highlightedEntryId={highlightedEntryId}
               />
             </div>
