@@ -270,7 +270,7 @@ export default function DashboardPage() {
   const loadMemos = async () => {
     if (!user) return;
     try {
-      const data = await getMemosByUser(user.uid, 200);
+      const data = await getMemosByUser(user.uid, 10000);
       setMemos(data);
     } catch (error) {
       console.error('メモ読み込みエラー:', error);
