@@ -68,7 +68,7 @@ service cloud.firestore {
         request.resource.data.userId == request.auth.uid &&
         request.resource.data.title is string &&
         request.resource.data.content is string &&
-        request.resource.data.period in ['short', 'medium', 'long'] &&
+        request.resource.data.period in ['short', 'medium', 'long', 'custom'] &&
         request.resource.data.deliveryDate is timestamp &&
         request.resource.data.createdAt is timestamp;
 

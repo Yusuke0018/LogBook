@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { PaperAirplaneIcon } from '@heroicons/react/24/solid';
+import { PaperAirplaneIcon, CalendarIcon } from '@heroicons/react/24/solid';
 import type { FutureLetterFormData, LetterPeriod } from '@/lib/types';
 
 interface FutureLetterFormProps {
@@ -13,30 +13,47 @@ const PERIOD_OPTIONS: { value: LetterPeriod; label: string; description: string;
   { value: 'short', label: '短期', description: '1ヶ月後〜半年後', emoji: '🌱' },
   { value: 'medium', label: '中期', description: '半年後〜1年後', emoji: '🌿' },
   { value: 'long', label: '長期', description: '1年後〜2年後', emoji: '🌳' },
+  { value: 'custom', label: '日付指定', description: '届く日を自分で選ぶ', emoji: '📅' },
 ];
+
+// 明日の日付を取得
+function getTomorrowDate(): string {
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  return tomorrow.toISOString().split('T')[0];
+}
 
 export default function FutureLetterForm({ onSubmit, onCancel }: FutureLetterFormProps) {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [period, setPeriod] = useState<LetterPeriod | null>(null);
+  const [customDate, setCustomDate] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const isValid =
+    content.trim() &&
+    title.trim() &&
+    period &&
+    (period !== 'custom' || customDate);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!content.trim() || !period || !title.trim()) return;
+    if (!isValid) return;
 
     setIsSubmitting(true);
     try {
       await onSubmit({
         title: title.trim(),
         content: content.trim(),
-        period,
+        period: period!,
+        customDate: period === 'custom' ? customDate : undefined,
       });
 
       // フォームをリセット
       setTitle('');
       setContent('');
       setPeriod(null);
+      setCustomDate('');
     } catch (error) {
       console.error('送信エラー:', error);
     } finally {
@@ -51,7 +68,7 @@ export default function FutureLetterForm({ onSubmit, onCancel }: FutureLetterFor
         <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
           いつ届く？ <span className="text-accent-500">*</span>
         </label>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {PERIOD_OPTIONS.map((option) => (
             <button
               key={option.value}
@@ -64,7 +81,7 @@ export default function FutureLetterForm({ onSubmit, onCancel }: FutureLetterFor
               }`}
             >
               <div className="text-2xl mb-2">{option.emoji}</div>
-              <div className="font-semibold text-gray-800 dark:text-gray-200">
+              <div className="font-semibold text-gray-800 dark:text-gray-200 text-sm">
                 {option.label}
               </div>
               <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
@@ -74,6 +91,33 @@ export default function FutureLetterForm({ onSubmit, onCancel }: FutureLetterFor
           ))}
         </div>
       </div>
+
+      {/* 日付指定（customの場合のみ表示） */}
+      {period === 'custom' && (
+        <div className="space-y-2 animate-fade-in">
+          <label
+            htmlFor="custom-date"
+            className="block text-sm font-semibold text-gray-700 dark:text-gray-300"
+          >
+            届ける日 <span className="text-accent-500">*</span>
+          </label>
+          <div className="relative">
+            <CalendarIcon className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+            <input
+              type="date"
+              id="custom-date"
+              value={customDate}
+              onChange={(e) => setCustomDate(e.target.value)}
+              min={getTomorrowDate()}
+              required
+              className="w-full pl-12 pr-4 py-3 bg-white/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:text-white transition-all"
+            />
+          </div>
+          <p className="text-xs text-gray-500 dark:text-gray-400">
+            明日以降の日付を選択してください
+          </p>
+        </div>
+      )}
 
       {/* タイトル */}
       <div className="space-y-2">
@@ -126,7 +170,7 @@ export default function FutureLetterForm({ onSubmit, onCancel }: FutureLetterFor
         )}
         <button
           type="submit"
-          disabled={isSubmitting || !content.trim() || !period || !title.trim()}
+          disabled={isSubmitting || !isValid}
           className="inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold text-white bg-gradient-to-r from-primary-500 to-secondary-500 hover:from-primary-600 hover:to-secondary-600 rounded-button shadow-card hover:shadow-soft-lg transform hover:scale-[1.01] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
         >
           <PaperAirplaneIcon className="h-5 w-5" />

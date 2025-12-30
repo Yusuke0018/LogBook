@@ -37,6 +37,9 @@ function generateRandomDeliveryDate(period: LetterPeriod): Date {
       minDays = 365;
       maxDays = 730;
       break;
+    case 'custom':
+      // カスタムの場合はこの関数は呼ばれない
+      throw new Error('Custom period requires customDate');
   }
 
   const randomDays = Math.floor(Math.random() * (maxDays - minDays + 1)) + minDays;
@@ -54,7 +57,14 @@ export async function createFutureLetter(
   }
 
   const now = Timestamp.now();
-  const deliveryDate = generateRandomDeliveryDate(data.period);
+
+  // カスタム日付の場合は指定日付を使用、それ以外はランダム生成
+  let deliveryDate: Date;
+  if (data.period === 'custom' && data.customDate) {
+    deliveryDate = new Date(data.customDate);
+  } else {
+    deliveryDate = generateRandomDeliveryDate(data.period);
+  }
 
   const letterData = {
     userId,

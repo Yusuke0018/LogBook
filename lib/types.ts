@@ -51,7 +51,7 @@ export interface EntryFormData {
 }
 
 // 未来への手紙
-export type LetterPeriod = 'short' | 'medium' | 'long';
+export type LetterPeriod = 'short' | 'medium' | 'long' | 'custom';
 
 export interface FutureLetter {
   id: string;
@@ -69,4 +69,5 @@ export interface FutureLetterFormData {
   title: string;
   content: string;
   period: LetterPeriod;
+  customDate?: string; // YYYY-MM-DD形式
 }
