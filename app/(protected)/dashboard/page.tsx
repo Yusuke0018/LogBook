@@ -9,7 +9,6 @@ import {
   updateEntry,
   deleteEntry,
   getEntriesByUser,
-  getEntriesByDateRange,
   entryMatchesSearchTerm,
 } from '@/lib/services/entries';
 import {
@@ -23,10 +22,9 @@ import { getUnreadLettersCount } from '@/lib/services/futureLetters';
 export const dynamic = 'force-dynamic';
 import {
   entriesToText,
-  entriesToCSV,
   downloadCSV,
   copyToClipboard,
-  memosToCSV,
+  unifiedToCSV,
 } from '@/lib/utils/export';
 import {
   format,
@@ -43,7 +41,6 @@ import { ja } from 'date-fns/locale';
 import EntryForm from '@/components/EntryForm';
 import UnifiedList, { UnifiedItem } from '@/components/UnifiedList';
 import Calendar from '@/components/Calendar';
-import ExportModal from '@/components/ExportModal';
 import Toast from '@/components/Toast';
 import InsightsPanel, {
   SummaryData,
@@ -208,7 +205,6 @@ export default function DashboardPage() {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [filters, setFilters] = useState<FiltersState>(INITIAL_FILTERS);
   const [trendPeriod, setTrendPeriod] = useState<TrendPeriod>('7');
-  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [editingEntry, setEditingEntry] = useState<Entry | null>(null);
   const [toast, setToast] = useState<{
     show: boolean;
@@ -526,23 +522,6 @@ export default function DashboardPage() {
     }
   };
 
-  const handleExport = async (startDate: Date, endDate: Date) => {
-    if (!user) return;
-    try {
-      const data = await getEntriesByDateRange(user.uid, startDate, endDate);
-      const csv = entriesToCSV(data);
-      const filename = `logbook_${format(startDate, 'yyyyMMdd')}_${format(
-        endDate,
-        'yyyyMMdd'
-      )}.csv`;
-      downloadCSV(csv, filename);
-      showToast('CSVをダウンロードしました');
-    } catch (error) {
-      console.error('エクスポートエラー:', error);
-      showToast('エクスポートに失敗しました', 'error');
-    }
-  };
-
   const showToast = (message: string, type: 'success' | 'error' = 'success') => {
     setToast({ show: true, message, type });
     setTimeout(() => setToast({ show: false, message: '', type: 'success' }), 3000);
@@ -745,25 +724,17 @@ export default function DashboardPage() {
                   </button>
                   <button
                     onClick={() => {
-                      const csv = memosToCSV(memos);
-                      const filename = `logbook_memos_${format(new Date(), 'yyyyMMdd')}.csv`;
+                      const csv = unifiedToCSV(filteredEntries, filteredMemos);
+                      const filename = `logbook_${format(new Date(), 'yyyyMMdd')}.csv`;
                       downloadCSV(csv, filename);
-                      showToast('断片をCSVでダウンロードしました');
+                      showToast('CSVをダウンロードしました');
                     }}
-                    disabled={memos.length === 0}
-                    className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-white bg-gradient-to-r from-yellow-500 to-orange-500 rounded-button hover:shadow-soft-lg hover:from-yellow-600 hover:to-orange-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                    title="断片をCSVでエクスポート"
+                    disabled={unifiedItems.length === 0}
+                    className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-gradient-to-r from-primary-500 to-secondary-500 rounded-button hover:shadow-soft-lg hover:from-primary-600 hover:to-secondary-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    title="CSVエクスポート"
                   >
                     <ArrowDownTrayIcon className="h-5 w-5" />
-                    <span className="hidden sm:inline">断片CSV</span>
-                  </button>
-                  <button
-                    onClick={() => setIsExportModalOpen(true)}
-                    className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-gradient-to-r from-primary-500 to-secondary-500 rounded-button hover:shadow-soft-lg hover:from-primary-600 hover:to-secondary-600 transition-all"
-                    title="投稿をCSVエクスポート"
-                  >
-                    <ArrowDownTrayIcon className="h-5 w-5" />
-                    <span className="hidden sm:inline">投稿CSV</span>
+                    <span className="hidden sm:inline">CSV</span>
                   </button>
                 </div>
               </div>
@@ -798,12 +769,6 @@ export default function DashboardPage() {
           </div>
         </div>
       </main>
-
-      <ExportModal
-        isOpen={isExportModalOpen}
-        onClose={() => setIsExportModalOpen(false)}
-        onExport={handleExport}
-      />
 
       <Toast show={toast.show} message={toast.message} type={toast.type} />
 

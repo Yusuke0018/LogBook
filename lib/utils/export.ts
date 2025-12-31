@@ -82,3 +82,35 @@ export function memosToText(memos: Memo[]): string {
     })
     .join('\n\n---\n\n');
 }
+
+export function unifiedToCSV(entries: Entry[], memos: Memo[]): string {
+  const headers = ['種類', '日時', 'タイトル', '本文', 'タグ', '天気', '気分スコア', '画像URL'];
+
+  const entryRows = entries.map((entry) => {
+    const date = entry.createdAt.toDate();
+    const dateStr = format(date, 'yyyy-MM-dd HH:mm:ss', { locale: ja });
+    const title = entry.title || '';
+    const content = `"${entry.content.replace(/"/g, '""')}"`;
+    const tags = entry.tags?.join(';') || '';
+    const weather = entry.weather || '';
+    const mood = typeof entry.mood === 'number' ? entry.mood.toString() : '';
+    const imageUrl = entry.imageUrl || '';
+    return ['投稿', dateStr, title, content, tags, weather, mood, imageUrl].join(',');
+  });
+
+  const memoRows = memos.map((memo) => {
+    const date = memo.createdAt.toDate();
+    const dateStr = format(date, 'yyyy-MM-dd HH:mm:ss', { locale: ja });
+    const content = `"${memo.content.replace(/"/g, '""')}"`;
+    const imageUrl = memo.imageUrl || '';
+    return ['断片', dateStr, '', content, '', '', '', imageUrl].join(',');
+  });
+
+  const allRows = [...entryRows, ...memoRows].sort((a, b) => {
+    const dateA = a.split(',')[1];
+    const dateB = b.split(',')[1];
+    return dateB.localeCompare(dateA);
+  });
+
+  return [headers.join(','), ...allRows].join('\n');
+}
