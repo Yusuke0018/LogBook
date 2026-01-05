@@ -108,7 +108,7 @@ export default function SeasonalAnimation({ sekkiName }: SeasonalAnimationProps)
   const particlesRef = useRef<Particle[]>([]);
   const windRef = useRef(0);
   const transitionAlphaRef = useRef(0);
-  const animationRef = useRef<number>();
+  const animationRef = useRef<number | null>(null);
   const lastTimeRef = useRef(0);
   const colorsRef = useRef<string[]>(['#fff']);
   const sizeMultiplierRef = useRef(1);
@@ -374,7 +374,7 @@ export default function SeasonalAnimation({ sekkiName }: SeasonalAnimationProps)
     return () => {
       window.removeEventListener('resize', resize);
       clearInterval(windInterval);
-      if (animationRef.current) {
+      if (animationRef.current !== null) {
         cancelAnimationFrame(animationRef.current);
       }
     };
