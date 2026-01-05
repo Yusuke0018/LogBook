@@ -97,14 +97,56 @@ body {
 
 /* 24節気ヘッダースタイル */
 .sekki-header {
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(8px);
-  border-bottom: 1px solid rgba(229, 231, 235, 0.5);
+  background: transparent;
 }
 
 .dark .sekki-header {
-  background: rgba(30, 41, 59, 0.85);
-  border-bottom: 1px solid rgba(51, 65, 85, 0.5);
+  background: transparent;
+}
+
+/* 透明ヘッダー（ボタン周囲のみ白くくり抜き） */
+.transparent-header {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.transparent-header .header-item {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(12px);
+  border-radius: 16px;
+  padding: 8px 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(229, 231, 235, 0.5);
+}
+
+.dark .transparent-header .header-item {
+  background: rgba(30, 41, 59, 0.9);
+  border: 1px solid rgba(51, 65, 85, 0.5);
+}
+
+.transparent-header .header-btn {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(12px);
+  border-radius: 12px;
+  padding: 8px 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(229, 231, 235, 0.5);
+  transition: all 0.2s ease;
+}
+
+.transparent-header .header-btn:hover {
+  background: rgba(255, 255, 255, 1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.dark .transparent-header .header-btn {
+  background: rgba(30, 41, 59, 0.9);
+  border: 1px solid rgba(51, 65, 85, 0.5);
+}
+
+.dark .transparent-header .header-btn:hover {
+  background: rgba(30, 41, 59, 1);
 }
 
 /* 24節気ごとの背景 */

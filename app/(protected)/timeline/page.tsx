@@ -45,13 +45,13 @@ export default function TimelinePage() {
 
   return (
     <div className="h-screen flex flex-col overflow-hidden">
-      <header className="glass sticky top-[52px] z-10 shadow-sm">
-        <div className="container mx-auto px-4 py-2">
+      <header className="transparent-header sticky top-[52px] z-10">
+        <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
+            <div className="header-item flex items-center gap-3">
               <Link
                 href="/dashboard"
-                className="inline-flex items-center gap-1 px-2 py-1 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-all rounded-button hover:bg-gray-50 dark:hover:bg-gray-800"
+                className="inline-flex items-center gap-1 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-all"
               >
                 <ChevronLeftIcon className="h-4 w-4" />
                 戻る
@@ -62,10 +62,12 @@ export default function TimelinePage() {
               </p>
             </div>
             <div className="flex items-center gap-2">
-              <ThemeToggle />
+              <div className="header-btn">
+                <ThemeToggle />
+              </div>
               <button
                 onClick={signOut}
-                className="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-all rounded-button hover:bg-gray-50 dark:hover:bg-gray-800"
+                className="header-btn inline-flex items-center gap-1 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-all"
               >
                 <ArrowRightOnRectangleIcon className="h-4 w-4" />
                 <span className="hidden sm:inline">ログアウト</span>

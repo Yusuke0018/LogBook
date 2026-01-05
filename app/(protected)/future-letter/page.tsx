@@ -105,13 +105,13 @@ export default function FutureLetterPage() {
   return (
     <div className="min-h-screen">
       {/* Header */}
-      <header className="glass sticky top-[52px] z-10 shadow-sm">
-        <div className="container mx-auto px-6 py-5">
+      <header className="transparent-header sticky top-[52px] z-10">
+        <div className="container mx-auto px-6 py-4">
           <div className="flex justify-between items-center">
-            <div className="flex items-center gap-4">
+            <div className="header-item flex items-center gap-4">
               <Link
                 href="/dashboard"
-                className="p-2 text-gray-500 hover:text-primary-600 dark:text-gray-400 dark:hover:text-primary-400 transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
+                className="p-2 text-gray-500 hover:text-primary-600 dark:text-gray-400 dark:hover:text-primary-400 transition-colors"
               >
                 <ArrowLeftIcon className="h-5 w-5" />
               </Link>
@@ -124,7 +124,9 @@ export default function FutureLetterPage() {
                 </h1>
               </div>
             </div>
-            <ThemeToggle />
+            <div className="header-btn">
+              <ThemeToggle />
+            </div>
           </div>
         </div>
       </header>
