@@ -531,47 +531,47 @@ export default function DashboardPage() {
     <div className="min-h-screen">
       {/* Header with transparent design */}
       <header className="transparent-header sticky top-[52px] z-10">
-        <div className="container mx-auto px-6 py-4">
-          <div className="flex justify-between items-center">
-            <div className="header-item flex items-center gap-3">
-              <div className="p-2.5 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-2xl shadow-soft">
-                <svg className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <div className="container mx-auto px-3 sm:px-6 py-3">
+          <div className="flex justify-between items-center gap-2">
+            <div className="header-item flex items-center gap-2 sm:gap-3 shrink-0">
+              <div className="p-2 sm:p-2.5 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-xl sm:rounded-2xl shadow-soft">
+                <svg className="h-5 w-5 sm:h-6 sm:w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                 </svg>
               </div>
-              <h1 className="text-2xl font-display font-bold bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
+              <h1 className="text-lg sm:text-2xl font-display font-bold bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
                 LogBook
               </h1>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 sm:gap-2">
               <Link
                 href="/future-letter"
-                className="header-btn relative inline-flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-all"
+                className="header-btn relative inline-flex items-center gap-1 sm:gap-2 text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-all !px-2 sm:!px-4"
               >
-                <EnvelopeIcon className="h-5 w-5" />
-                未来への手紙
+                <EnvelopeIcon className="h-4 w-4 sm:h-5 sm:w-5" />
+                <span className="hidden sm:inline">未来への手紙</span>
                 {unreadLettersCount > 0 && (
-                  <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white animate-pulse">
+                  <span className="absolute -top-1 -right-1 flex h-4 w-4 sm:h-5 sm:w-5 items-center justify-center rounded-full bg-red-500 text-[9px] sm:text-[10px] font-bold text-white animate-pulse">
                     {unreadLettersCount}
                   </span>
                 )}
               </Link>
               <Link
                 href="/timeline"
-                className="header-btn inline-flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-all"
+                className="header-btn inline-flex items-center gap-1 sm:gap-2 text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-all !px-2 sm:!px-4"
               >
-                <CalendarDaysIcon className="h-5 w-5" />
-                年表
+                <CalendarDaysIcon className="h-4 w-4 sm:h-5 sm:w-5" />
+                <span className="hidden sm:inline">年表</span>
               </Link>
-              <div className="header-btn">
+              <div className="header-btn !px-2 sm:!px-4">
                 <ThemeToggle />
               </div>
               <button
                 onClick={signOut}
-                className="header-btn inline-flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-all"
+                className="header-btn inline-flex items-center gap-1 sm:gap-2 text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-all !px-2 sm:!px-4"
               >
-                <ArrowRightOnRectangleIcon className="h-5 w-5" />
-                ログアウト
+                <ArrowRightOnRectangleIcon className="h-4 w-4 sm:h-5 sm:w-5" />
+                <span className="hidden sm:inline">ログアウト</span>
               </button>
             </div>
           </div>

@@ -32,29 +32,29 @@ export default function SekkiHeader({ className = '' }: SekkiHeaderProps) {
 
   return (
     <div className={`sekki-header sticky top-0 z-20 ${className}`}>
-      <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-4 py-3 px-4">
-        <div className="flex items-center gap-2">
-          <span className="text-lg">{seasonIcons[currentSekki.season]}</span>
-          <span className="text-lg font-bold text-gray-800 dark:text-gray-100">
+      <div className="flex items-center justify-center gap-2 sm:gap-4 py-2 sm:py-3 px-3 sm:px-4">
+        <div className="flex items-center gap-1 sm:gap-2">
+          <span className="text-base sm:text-lg">{seasonIcons[currentSekki.season]}</span>
+          <span className="text-base sm:text-lg font-bold text-gray-800 dark:text-gray-100">
             {currentSekki.name}
           </span>
         </div>
 
         {nextSekki && daysUntilNext !== null && (
-          <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+          <div className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm text-gray-600 dark:text-gray-300">
             <span className="hidden sm:inline">|</span>
             <span>
               次は <span className="font-semibold">{nextSekki.name}</span>
               <span className="ml-1">
-                （あと<span className="font-semibold text-primary-600 dark:text-primary-400">{daysUntilNext}</span>日）
+                （<span className="font-semibold text-primary-600 dark:text-primary-400">{daysUntilNext}</span>日）
               </span>
             </span>
           </div>
         )}
 
-        <div className="hidden md:flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+        <div className="hidden lg:flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
           <span>|</span>
-          <span>{currentSekki.description}</span>
+          <span className="max-w-xs truncate">{currentSekki.description}</span>
         </div>
       </div>
     </div>
