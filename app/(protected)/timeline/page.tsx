@@ -44,8 +44,8 @@ export default function TimelinePage() {
   };
 
   return (
-    <div className="h-screen bg-gradient-to-br from-primary-50 via-white to-secondary-50 dark:bg-gray-900 flex flex-col overflow-hidden">
-      <header className="glass sticky top-0 z-10 shadow-sm">
+    <div className="h-screen flex flex-col overflow-hidden">
+      <header className="glass sticky top-[52px] z-10 shadow-sm">
         <div className="container mx-auto px-4 py-2">
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-3">

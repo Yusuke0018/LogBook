@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/hooks/useAuth';
+import SekkiBackground from '@/components/SekkiBackground';
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic';
@@ -36,5 +37,5 @@ export default function ProtectedLayout({
     return null;
   }
 
-  return <>{children}</>;
+  return <SekkiBackground>{children}</SekkiBackground>;
 }

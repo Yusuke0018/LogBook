@@ -528,9 +528,9 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-secondary-50 dark:bg-gray-900">
+    <div className="min-h-screen">
       {/* Header with clean design */}
-      <header className="glass sticky top-0 z-10 shadow-sm">
+      <header className="glass sticky top-[52px] z-10 shadow-sm">
         <div className="container mx-auto px-6 py-5">
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-3">

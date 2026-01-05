@@ -94,3 +94,337 @@ body {
     background: #6b7280;
   }
 }
+
+/* 24節気ヘッダースタイル */
+.sekki-header {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid rgba(229, 231, 235, 0.5);
+}
+
+.dark .sekki-header {
+  background: rgba(30, 41, 59, 0.85);
+  border-bottom: 1px solid rgba(51, 65, 85, 0.5);
+}
+
+/* 24節気ごとの背景 */
+/* 春 - Spring */
+.bg-立春 {
+  background:
+    radial-gradient(circle at 10% 90%, rgba(255, 105, 180, 0.2) 0%, transparent 40%),
+    radial-gradient(circle at 80% 20%, rgba(255, 240, 245, 0.3) 0%, transparent 50%),
+    linear-gradient(135deg, #fdf5f6 0%, #f8e0e6 100%);
+}
+.dark .bg-立春 {
+  background:
+    radial-gradient(circle at 10% 90%, rgba(255, 105, 180, 0.15) 0%, transparent 40%),
+    radial-gradient(circle at 80% 20%, rgba(255, 182, 193, 0.1) 0%, transparent 50%),
+    linear-gradient(135deg, #1f1a1b 0%, #2d1f24 100%);
+}
+
+.bg-雨水 {
+  background:
+    radial-gradient(ellipse at 20% 80%, rgba(173, 216, 230, 0.3) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 20%, rgba(144, 238, 144, 0.2) 0%, transparent 40%),
+    linear-gradient(180deg, #f0f8ff 0%, #e6f3ff 100%);
+}
+.dark .bg-雨水 {
+  background:
+    radial-gradient(ellipse at 20% 80%, rgba(173, 216, 230, 0.1) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 20%, rgba(144, 238, 144, 0.08) 0%, transparent 40%),
+    linear-gradient(180deg, #1a1f24 0%, #1a2233 100%);
+}
+
+.bg-啓蟄 {
+  background:
+    radial-gradient(circle at 25% 75%, rgba(139, 69, 19, 0.15) 0%, transparent 40%),
+    radial-gradient(circle at 75% 25%, rgba(152, 251, 152, 0.3) 0%, transparent 45%),
+    linear-gradient(135deg, #f5deb3 0%, #e8f5e8 100%);
+}
+.dark .bg-啓蟄 {
+  background:
+    radial-gradient(circle at 25% 75%, rgba(139, 69, 19, 0.1) 0%, transparent 40%),
+    radial-gradient(circle at 75% 25%, rgba(152, 251, 152, 0.1) 0%, transparent 45%),
+    linear-gradient(135deg, #2a2318 0%, #1a2a1a 100%);
+}
+
+.bg-春分 {
+  background:
+    radial-gradient(circle at 50% 50%, rgba(255, 182, 193, 0.35) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(135, 206, 250, 0.2) 0%, transparent 40%),
+    linear-gradient(135deg, #fff0f5 0%, #e6f3ff 100%);
+}
+.dark .bg-春分 {
+  background:
+    radial-gradient(circle at 50% 50%, rgba(255, 182, 193, 0.12) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(135, 206, 250, 0.08) 0%, transparent 40%),
+    linear-gradient(135deg, #2a1f24 0%, #1a2233 100%);
+}
+
+.bg-清明 {
+  background:
+    radial-gradient(circle at 30% 60%, rgba(0, 191, 255, 0.2) 0%, transparent 50%),
+    radial-gradient(circle at 70% 40%, rgba(50, 205, 50, 0.3) 0%, transparent 45%),
+    linear-gradient(120deg, #f0ffff 0%, #e6ffe6 100%);
+}
+.dark .bg-清明 {
+  background:
+    radial-gradient(circle at 30% 60%, rgba(0, 191, 255, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 70% 40%, rgba(50, 205, 50, 0.1) 0%, transparent 45%),
+    linear-gradient(120deg, #1a2a2a 0%, #1a2a1a 100%);
+}
+
+.bg-穀雨 {
+  background:
+    radial-gradient(ellipse at 40% 60%, rgba(70, 130, 180, 0.35) 0%, transparent 45%),
+    radial-gradient(ellipse at 60% 40%, rgba(34, 139, 34, 0.3) 0%, transparent 50%),
+    linear-gradient(180deg, #e6f7ff 0%, #dcf0dc 100%);
+}
+.dark .bg-穀雨 {
+  background:
+    radial-gradient(ellipse at 40% 60%, rgba(70, 130, 180, 0.12) 0%, transparent 45%),
+    radial-gradient(ellipse at 60% 40%, rgba(34, 139, 34, 0.1) 0%, transparent 50%),
+    linear-gradient(180deg, #1a2833 0%, #1a2a1a 100%);
+}
+
+/* 夏 - Summer */
+.bg-立夏 {
+  background:
+    radial-gradient(circle at 30% 70%, rgba(0, 255, 127, 0.3) 0%, transparent 45%),
+    radial-gradient(circle at 70% 30%, rgba(50, 205, 50, 0.2) 0%, transparent 40%),
+    linear-gradient(135deg, #f0fff0 0%, #e6ffe6 100%);
+}
+.dark .bg-立夏 {
+  background:
+    radial-gradient(circle at 30% 70%, rgba(0, 255, 127, 0.1) 0%, transparent 45%),
+    radial-gradient(circle at 70% 30%, rgba(50, 205, 50, 0.08) 0%, transparent 40%),
+    linear-gradient(135deg, #1a2a1a 0%, #1a2a1a 100%);
+}
+
+.bg-小満 {
+  background:
+    radial-gradient(circle at 25% 75%, rgba(255, 255, 0, 0.2) 0%, transparent 40%),
+    radial-gradient(circle at 75% 25%, rgba(173, 255, 47, 0.3) 0%, transparent 45%),
+    linear-gradient(120deg, #ffffe0 0%, #f0fff0 100%);
+}
+.dark .bg-小満 {
+  background:
+    radial-gradient(circle at 25% 75%, rgba(255, 255, 0, 0.08) 0%, transparent 40%),
+    radial-gradient(circle at 75% 25%, rgba(173, 255, 47, 0.1) 0%, transparent 45%),
+    linear-gradient(120deg, #2a2a1a 0%, #1a2a1a 100%);
+}
+
+.bg-芒種 {
+  background:
+    radial-gradient(ellipse at 50% 80%, rgba(34, 139, 34, 0.3) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 20%, rgba(210, 180, 140, 0.2) 0%, transparent 45%),
+    linear-gradient(180deg, #f5f5dc 0%, #e6f0e6 100%);
+}
+.dark .bg-芒種 {
+  background:
+    radial-gradient(ellipse at 50% 80%, rgba(34, 139, 34, 0.1) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 20%, rgba(210, 180, 140, 0.08) 0%, transparent 45%),
+    linear-gradient(180deg, #2a2a1f 0%, #1a2a1a 100%);
+}
+
+.bg-夏至 {
+  background:
+    radial-gradient(ellipse at 50% 10%, rgba(255, 215, 0, 0.4) 0%, transparent 35%),
+    radial-gradient(circle at 50% 80%, rgba(240, 248, 255, 0.35) 0%, transparent 50%),
+    linear-gradient(to bottom, #fffacd 0%, #add8e6 100%);
+}
+.dark .bg-夏至 {
+  background:
+    radial-gradient(ellipse at 50% 10%, rgba(255, 215, 0, 0.15) 0%, transparent 35%),
+    radial-gradient(circle at 50% 80%, rgba(100, 149, 237, 0.1) 0%, transparent 50%),
+    linear-gradient(to bottom, #2a2a1a 0%, #1a2a33 100%);
+}
+
+.bg-小暑 {
+  background:
+    radial-gradient(circle at 20% 80%, rgba(30, 144, 255, 0.3) 0%, transparent 40%),
+    radial-gradient(circle at 80% 20%, rgba(255, 165, 0, 0.3) 0%, transparent 45%),
+    linear-gradient(135deg, #f0f8ff 0%, #fff0e6 100%);
+}
+.dark .bg-小暑 {
+  background:
+    radial-gradient(circle at 20% 80%, rgba(30, 144, 255, 0.1) 0%, transparent 40%),
+    radial-gradient(circle at 80% 20%, rgba(255, 165, 0, 0.1) 0%, transparent 45%),
+    linear-gradient(135deg, #1a2233 0%, #2a2418 100%);
+}
+
+.bg-大暑 {
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(255, 69, 0, 0.35) 0%, transparent 40%),
+    radial-gradient(circle at 50% 100%, rgba(0, 0, 139, 0.2) 0%, transparent 50%),
+    linear-gradient(180deg, #ffefd5 0%, #e6e6fa 100%);
+}
+.dark .bg-大暑 {
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(255, 69, 0, 0.15) 0%, transparent 40%),
+    radial-gradient(circle at 50% 100%, rgba(0, 0, 139, 0.08) 0%, transparent 50%),
+    linear-gradient(180deg, #2a2418 0%, #1a1a2a 100%);
+}
+
+/* 秋 - Autumn */
+.bg-立秋 {
+  background:
+    radial-gradient(circle at 30% 70%, rgba(135, 206, 250, 0.2) 0%, transparent 45%),
+    radial-gradient(circle at 70% 30%, rgba(255, 165, 0, 0.15) 0%, transparent 40%),
+    linear-gradient(135deg, #f0f8ff 0%, #fff0e6 100%);
+}
+.dark .bg-立秋 {
+  background:
+    radial-gradient(circle at 30% 70%, rgba(135, 206, 250, 0.08) 0%, transparent 45%),
+    radial-gradient(circle at 70% 30%, rgba(255, 165, 0, 0.06) 0%, transparent 40%),
+    linear-gradient(135deg, #1a2233 0%, #2a2418 100%);
+}
+
+.bg-処暑 {
+  background:
+    radial-gradient(ellipse at 40% 60%, rgba(176, 196, 222, 0.3) 0%, transparent 45%),
+    radial-gradient(ellipse at 60% 40%, rgba(245, 245, 220, 0.2) 0%, transparent 40%),
+    linear-gradient(120deg, #f0f8ff 0%, #f5f5dc 100%);
+}
+.dark .bg-処暑 {
+  background:
+    radial-gradient(ellipse at 40% 60%, rgba(176, 196, 222, 0.1) 0%, transparent 45%),
+    radial-gradient(ellipse at 60% 40%, rgba(245, 245, 220, 0.08) 0%, transparent 40%),
+    linear-gradient(120deg, #1a2233 0%, #2a2a1f 100%);
+}
+
+.bg-白露 {
+  background:
+    radial-gradient(circle at 25% 75%, rgba(255, 255, 255, 0.45) 0%, transparent 35%),
+    radial-gradient(circle at 75% 25%, rgba(175, 238, 238, 0.2) 0%, transparent 40%),
+    linear-gradient(135deg, #f0ffff 0%, #f5fffa 100%);
+}
+.dark .bg-白露 {
+  background:
+    radial-gradient(circle at 25% 75%, rgba(255, 255, 255, 0.08) 0%, transparent 35%),
+    radial-gradient(circle at 75% 25%, rgba(175, 238, 238, 0.06) 0%, transparent 40%),
+    linear-gradient(135deg, #1a2a2a 0%, #1a2a24 100%);
+}
+
+.bg-秋分 {
+  background:
+    radial-gradient(circle at 20% 80%, rgba(255, 69, 0, 0.3) 0%, transparent 40%),
+    radial-gradient(circle at 80% 20%, rgba(255, 140, 0, 0.2) 0%, transparent 40%),
+    linear-gradient(135deg, #fff0e6 0%, #ffdab9 100%);
+}
+.dark .bg-秋分 {
+  background:
+    radial-gradient(circle at 20% 80%, rgba(255, 69, 0, 0.1) 0%, transparent 40%),
+    radial-gradient(circle at 80% 20%, rgba(255, 140, 0, 0.08) 0%, transparent 40%),
+    linear-gradient(135deg, #2a2418 0%, #2a2015 100%);
+}
+
+.bg-寒露 {
+  background:
+    radial-gradient(ellipse at 30% 70%, rgba(176, 224, 230, 0.3) 0%, transparent 45%),
+    radial-gradient(ellipse at 70% 30%, rgba(221, 160, 221, 0.2) 0%, transparent 40%),
+    linear-gradient(120deg, #f0f8ff 0%, #e6e6fa 100%);
+}
+.dark .bg-寒露 {
+  background:
+    radial-gradient(ellipse at 30% 70%, rgba(176, 224, 230, 0.1) 0%, transparent 45%),
+    radial-gradient(ellipse at 70% 30%, rgba(221, 160, 221, 0.08) 0%, transparent 40%),
+    linear-gradient(120deg, #1a2233 0%, #1f1a24 100%);
+}
+
+.bg-霜降 {
+  background:
+    radial-gradient(circle at 40% 60%, rgba(255, 250, 250, 0.45) 0%, transparent 50%),
+    radial-gradient(circle at 60% 40%, rgba(176, 196, 222, 0.2) 0%, transparent 45%),
+    linear-gradient(180deg, #f5f5f5 0%, #e6f0ff 100%);
+}
+.dark .bg-霜降 {
+  background:
+    radial-gradient(circle at 40% 60%, rgba(255, 250, 250, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 60% 40%, rgba(176, 196, 222, 0.06) 0%, transparent 45%),
+    linear-gradient(180deg, #1f1f1f 0%, #1a2233 100%);
+}
+
+/* 冬 - Winter */
+.bg-立冬 {
+  background:
+    radial-gradient(circle at 30% 70%, rgba(176, 196, 222, 0.3) 0%, transparent 45%),
+    radial-gradient(circle at 70% 30%, rgba(135, 206, 250, 0.15) 0%, transparent 40%),
+    linear-gradient(135deg, #f0f8ff 0%, #e6e6fa 100%);
+}
+.dark .bg-立冬 {
+  background:
+    radial-gradient(circle at 30% 70%, rgba(176, 196, 222, 0.1) 0%, transparent 45%),
+    radial-gradient(circle at 70% 30%, rgba(135, 206, 250, 0.06) 0%, transparent 40%),
+    linear-gradient(135deg, #1a2233 0%, #1f1a24 100%);
+}
+
+.bg-小雪 {
+  background:
+    radial-gradient(circle at 25% 75%, rgba(248, 248, 255, 0.5) 0%, transparent 40%),
+    radial-gradient(circle at 75% 25%, rgba(211, 211, 211, 0.3) 0%, transparent 45%),
+    linear-gradient(120deg, #f5f5f5 0%, #e6e6e6 100%);
+}
+.dark .bg-小雪 {
+  background:
+    radial-gradient(circle at 25% 75%, rgba(248, 248, 255, 0.08) 0%, transparent 40%),
+    radial-gradient(circle at 75% 25%, rgba(211, 211, 211, 0.05) 0%, transparent 45%),
+    linear-gradient(120deg, #1f1f1f 0%, #1a1a1a 100%);
+}
+
+.bg-大雪 {
+  background:
+    radial-gradient(ellipse at 50% 50%, rgba(255, 255, 255, 0.6) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(176, 224, 230, 0.2) 0%, transparent 40%),
+    linear-gradient(180deg, #ffffff 0%, #f0f8ff 100%);
+}
+.dark .bg-大雪 {
+  background:
+    radial-gradient(ellipse at 50% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(176, 224, 230, 0.06) 0%, transparent 40%),
+    linear-gradient(180deg, #1f1f1f 0%, #1a2233 100%);
+}
+
+.bg-冬至 {
+  background:
+    radial-gradient(ellipse at 50% 90%, rgba(0, 0, 128, 0.25) 0%, transparent 50%),
+    radial-gradient(circle at 25% 25%, rgba(255, 255, 224, 0.15) 0%, transparent 40%),
+    linear-gradient(to top, #2a3a5a 0%, #1a2a4a 100%);
+}
+.dark .bg-冬至 {
+  background:
+    radial-gradient(ellipse at 50% 90%, rgba(0, 0, 128, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 25% 25%, rgba(255, 255, 224, 0.05) 0%, transparent 40%),
+    linear-gradient(to top, #0a0a1a 0%, #0a0a15 100%);
+}
+
+.bg-小寒 {
+  background:
+    radial-gradient(circle at 30% 70%, rgba(175, 238, 238, 0.3) 0%, transparent 45%),
+    radial-gradient(circle at 70% 30%, rgba(224, 255, 255, 0.2) 0%, transparent 40%),
+    linear-gradient(135deg, #f0ffff 0%, #e0ffff 100%);
+}
+.dark .bg-小寒 {
+  background:
+    radial-gradient(circle at 30% 70%, rgba(175, 238, 238, 0.1) 0%, transparent 45%),
+    radial-gradient(circle at 70% 30%, rgba(224, 255, 255, 0.06) 0%, transparent 40%),
+    linear-gradient(135deg, #1a2a2a 0%, #1a2a2a 100%);
+}
+
+.bg-大寒 {
+  background:
+    radial-gradient(ellipse at 50% 50%, rgba(112, 128, 144, 0.35) 0%, transparent 60%),
+    radial-gradient(circle at 10% 90%, rgba(255, 255, 255, 0.3) 0%, transparent 40%),
+    linear-gradient(135deg, #f0f8ff 0%, #e6e6fa 100%);
+}
+.dark .bg-大寒 {
+  background:
+    radial-gradient(ellipse at 50% 50%, rgba(112, 128, 144, 0.12) 0%, transparent 60%),
+    radial-gradient(circle at 10% 90%, rgba(255, 255, 255, 0.05) 0%, transparent 40%),
+    linear-gradient(135deg, #1a2233 0%, #1f1a24 100%);
+}
+
+/* 節気の背景トランジション */
+[class*="bg-"] {
+  transition: background 1s ease-in-out;
+}
