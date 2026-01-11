@@ -71,3 +71,23 @@ export interface FutureLetterFormData {
   period: LetterPeriod;
   customDate?: string; // YYYY-MM-DD形式
 }
+
+// 週次振り返り
+export interface WeeklyReview {
+  id: string;
+  userId: string;
+  weekStartDate: Timestamp; // その週の日曜日
+  stabilityScore: number; // 安定スコア (0-10)
+  stimulationScore: number; // 刺激スコア (0-10)
+  nextWeekTask: string; // 来週やること（1つ）
+  freeMemo?: string; // 自由メモ（任意）
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+
+export interface WeeklyReviewFormData {
+  stabilityScore: number;
+  stimulationScore: number;
+  nextWeekTask: string;
+  freeMemo?: string;
+}

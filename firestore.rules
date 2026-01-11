@@ -79,5 +79,31 @@ service cloud.firestore {
       allow delete: if isAuthenticated() &&
         resource.data.userId == request.auth.uid;
     }
+
+    // weeklyReviewsコレクション（週次振り返り）
+    match /weeklyReviews/{reviewId} {
+      allow read: if isAuthenticated() &&
+        resource.data.userId == request.auth.uid;
+
+      allow create: if isAuthenticated() &&
+        request.resource.data.userId == request.auth.uid &&
+        request.resource.data.weekStartDate is timestamp &&
+        request.resource.data.stabilityScore is number &&
+        request.resource.data.stabilityScore >= 0 &&
+        request.resource.data.stabilityScore <= 10 &&
+        request.resource.data.stimulationScore is number &&
+        request.resource.data.stimulationScore >= 0 &&
+        request.resource.data.stimulationScore <= 10 &&
+        request.resource.data.nextWeekTask is string &&
+        request.resource.data.createdAt is timestamp &&
+        request.resource.data.updatedAt is timestamp;
+
+      allow update: if isAuthenticated() &&
+        resource.data.userId == request.auth.uid &&
+        request.resource.data.userId == request.auth.uid;
+
+      allow delete: if isAuthenticated() &&
+        resource.data.userId == request.auth.uid;
+    }
   }
 }

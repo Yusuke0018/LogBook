@@ -48,6 +48,7 @@ import InsightsPanel, {
   MoodTrendPoint,
 } from '@/components/InsightsPanel';
 import QuickMemo from '@/components/QuickMemo';
+import WeeklyReviewPrompt from '@/components/WeeklyReviewPrompt';
 import {
   ClipboardDocumentIcon,
   ArrowDownTrayIcon,
@@ -582,6 +583,9 @@ export default function DashboardPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-8">
+            {/* Weekly Review Prompt */}
+            {user && <WeeklyReviewPrompt userId={user.uid} />}
+
             {/* New Entry Card */}
             <div className="card p-8 animate-fade-in">
               <div className="flex items-center gap-3 mb-8">
