@@ -20,7 +20,7 @@ interface WeeklyReviewPromptProps {
 }
 
 export default function WeeklyReviewPrompt({ userId, onComplete }: WeeklyReviewPromptProps) {
-  const [isVisible, setIsVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState(true); // デフォルトで表示
   const [existingReview, setExistingReview] = useState<WeeklyReview | null>(null);
   const [stabilityScore, setStabilityScore] = useState(5);
   const [stimulationScore, setStimulationScore] = useState(5);
@@ -29,12 +29,16 @@ export default function WeeklyReviewPrompt({ userId, onComplete }: WeeklyReviewP
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    checkReviewStatus();
+    if (userId) {
+      checkReviewStatus();
+    }
   }, [userId]);
 
   const checkReviewStatus = async () => {
+    setIsLoading(true);
     try {
       const review = await getCurrentWeekReview(userId);
       if (review) {
@@ -44,16 +48,18 @@ export default function WeeklyReviewPrompt({ userId, onComplete }: WeeklyReviewP
         setNextWeekTask(review.nextWeekTask);
         setFreeMemo(review.freeMemo || '');
         setIsCompleted(true);
-        // 書いた後は日曜日のみコンパクト表示
-        if (isSunday()) {
-          setIsVisible(true);
-        }
+        // 書いた後は日曜日のみコンパクト表示、それ以外は非表示
+        setIsVisible(isSunday());
       } else {
-        // 書いていない場合は常に表示（次の日曜日まで）
+        // 書いていない場合は常に表示
         setIsVisible(true);
       }
     } catch (error) {
       console.error('振り返りステータスの確認に失敗:', error);
+      // エラー時も表示（初回利用時はコレクションがないため）
+      setIsVisible(true);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -89,7 +95,8 @@ export default function WeeklyReviewPrompt({ userId, onComplete }: WeeklyReviewP
   const weekStart = getWeekStartDate();
   const weekLabel = format(weekStart, 'M月d日', { locale: ja });
 
-  if (!isVisible) return null;
+  // ローディング中またはエラー時もフォームを表示
+  if (!isVisible && !isLoading) return null;
 
   // 完了済み & 編集モードでない場合は簡潔な表示
   if (isCompleted && !isEditing) {
