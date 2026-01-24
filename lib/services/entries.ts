@@ -25,6 +25,17 @@ export async function createEntry(
   }
 
   const now = Timestamp.now();
+
+  // entryDateが指定されている場合はその日付を使用、なければ現在時刻
+  let createdAt = now;
+  if (data.entryDate) {
+    const entryDate = new Date(data.entryDate);
+    // 現在時刻の時分秒を設定
+    const nowDate = new Date();
+    entryDate.setHours(nowDate.getHours(), nowDate.getMinutes(), nowDate.getSeconds());
+    createdAt = Timestamp.fromDate(entryDate);
+  }
+
   const entryData = {
     userId,
     title: data.title || '',
@@ -33,7 +44,7 @@ export async function createEntry(
     weather: data.weather || '',
     mood: data.mood ?? null,
     imageUrl: data.imageUrl || '',
-    createdAt: now,
+    createdAt,
     updatedAt: now,
   };
 
@@ -73,6 +84,13 @@ export async function updateEntry(
   }
   if (data.imageUrl !== undefined) {
     updateData.imageUrl = data.imageUrl;
+  }
+  if (data.entryDate !== undefined) {
+    const entryDate = new Date(data.entryDate);
+    // 現在時刻の時分秒を設定
+    const nowDate = new Date();
+    entryDate.setHours(nowDate.getHours(), nowDate.getMinutes(), nowDate.getSeconds());
+    updateData.createdAt = Timestamp.fromDate(entryDate);
   }
 
   await updateDoc(entryRef, updateData);

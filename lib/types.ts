@@ -48,6 +48,7 @@ export interface EntryFormData {
   weather?: string;
   mood?: number | null;
   imageUrl?: string;
+  entryDate?: string; // YYYY-MM-DD形式、過去の日付のみ許可
 }
 
 // 未来への手紙

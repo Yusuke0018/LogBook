@@ -1,22 +1,28 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { PaperAirplaneIcon, PhotoIcon, XMarkIcon } from '@heroicons/react/24/solid';
+import { PaperAirplaneIcon, PhotoIcon, XMarkIcon, CalendarIcon } from '@heroicons/react/24/solid';
 import type { EntryFormData } from '@/lib/types';
 import { MOOD_SCALE } from '@/lib/constants/entry';
 import { uploadImage } from '@/lib/services/storage';
+import { format } from 'date-fns';
 
 interface EntryFormProps {
   onSubmit: (data: EntryFormData) => Promise<void>;
   initialData?: Partial<EntryFormData>;
+  initialCreatedAt?: Date; // 編集時の既存の日付
   submitLabel?: string;
   onCancel?: () => void;
   userId?: string;
 }
 
+// 今日の日付をYYYY-MM-DD形式で取得
+const getTodayString = () => format(new Date(), 'yyyy-MM-dd');
+
 export default function EntryForm({
   onSubmit,
   initialData,
+  initialCreatedAt,
   submitLabel = '投稿',
   onCancel,
   userId,
@@ -25,6 +31,7 @@ export default function EntryForm({
   const [content, setContent] = useState('');
   const [weather, setWeather] = useState('');
   const [mood, setMood] = useState<number | null>(null);
+  const [entryDate, setEntryDate] = useState(getTodayString());
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -43,16 +50,21 @@ export default function EntryForm({
       setExistingImageUrl(initialData.imageUrl || null);
       setImageFile(null);
       setImagePreview(null);
+      // 編集時は既存の日付を設定
+      if (initialCreatedAt) {
+        setEntryDate(format(initialCreatedAt, 'yyyy-MM-dd'));
+      }
     } else {
       setTitle('');
       setContent('');
       setWeather('');
       setMood(null);
+      setEntryDate(getTodayString());
       setExistingImageUrl(null);
       setImageFile(null);
       setImagePreview(null);
     }
-  }, [initialData]);
+  }, [initialData, initialCreatedAt]);
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -99,6 +111,7 @@ export default function EntryForm({
         weather: weather.trim() || undefined,
         mood,
         imageUrl,
+        entryDate,
       };
 
       await onSubmit(data);
@@ -109,6 +122,7 @@ export default function EntryForm({
         setContent('');
         setWeather('');
         setMood(null);
+        setEntryDate(getTodayString());
         setImageFile(null);
         setImagePreview(null);
         setExistingImageUrl(null);
@@ -125,6 +139,30 @@ export default function EntryForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
+      {/* 日付選択 */}
+      <div className="space-y-2">
+        <label
+          htmlFor="entryDate"
+          className="block text-sm font-semibold text-gray-700 dark:text-gray-300"
+        >
+          <span className="flex items-center gap-1.5">
+            <CalendarIcon className="h-4 w-4" />
+            日付
+          </span>
+        </label>
+        <input
+          type="date"
+          id="entryDate"
+          value={entryDate}
+          max={getTodayString()}
+          onChange={(e) => setEntryDate(e.target.value)}
+          className="w-full px-4 py-3 bg-white/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:text-white transition-all"
+        />
+        <p className="text-xs text-gray-500 dark:text-gray-400">
+          過去の日付のみ選択できます
+        </p>
+      </div>
+
       <div className="space-y-2">
         <label
           htmlFor="title"

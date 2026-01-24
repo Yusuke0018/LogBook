@@ -601,6 +601,7 @@ export default function DashboardPage() {
               <EntryForm
                 onSubmit={editingEntry ? handleUpdateEntry : handleCreateEntry}
                 initialData={editingEntry || undefined}
+                initialCreatedAt={editingEntry?.createdAt.toDate()}
                 submitLabel={editingEntry ? '更新' : '投稿'}
                 onCancel={editingEntry ? handleCancelEdit : undefined}
                 userId={user?.uid}
