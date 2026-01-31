@@ -22,12 +22,17 @@ export async function createMemo(
   }
 
   const now = Timestamp.now();
-  const memoData = {
+  const memoData: Record<string, unknown> = {
     userId,
     content: data.content.slice(0, 140), // 140文字制限
     imageUrl: data.imageUrl || '',
     createdAt: now,
   };
+
+  // 気分スコアがある場合のみ追加
+  if (data.mood !== undefined && data.mood >= 1 && data.mood <= 5) {
+    memoData.mood = data.mood;
+  }
 
   const docRef = await addDoc(collection(db, COLLECTION_NAME), memoData);
   return docRef.id;

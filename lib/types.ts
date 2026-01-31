@@ -21,12 +21,14 @@ export interface Memo {
   id: string;
   userId: string;
   content: string;
+  mood?: number; // 気分スコア 1-5（任意）
   imageUrl?: string;
   createdAt: Timestamp;
 }
 
 export interface MemoFormData {
   content: string;
+  mood?: number; // 気分スコア 1-5（任意）
   imageUrl?: string;
 }
 
@@ -110,16 +112,3 @@ export interface HealthLogFormData {
   steps: number;
 }
 
-// 気分ログ（1日何回でも記録可能）
-export interface MoodLog {
-  id: string;
-  userId: string;
-  score: number; // 気分スコア（0-10）
-  note?: string; // メモ（任意）
-  createdAt: Timestamp;
-}
-
-export interface MoodLogFormData {
-  score: number;
-  note?: string;
-}

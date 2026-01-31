@@ -58,7 +58,6 @@ import {
   HeartIcon,
 } from '@heroicons/react/24/outline';
 import ThemeToggle from '@/components/ThemeToggle';
-import MoodLogPanel from '@/components/MoodLogPanel';
 import type { Entry, EntryFormData, Memo } from '@/lib/types';
 
 type TrendPeriod = '7' | '30';
@@ -252,10 +251,10 @@ export default function DashboardPage() {
     }
   };
 
-  const handleCreateMemo = async (content: string, imageUrl?: string) => {
+  const handleCreateMemo = async (content: string, mood?: number, imageUrl?: string) => {
     if (!user) return;
     try {
-      await createMemo(user.uid, { content, imageUrl });
+      await createMemo(user.uid, { content, mood, imageUrl });
       await loadMemos();
       showToast('メモを追加しました');
     } catch (error) {
@@ -760,8 +759,6 @@ export default function DashboardPage() {
         onDelete={handleDeleteMemo}
         userId={user?.uid}
       />
-
-      <MoodLogPanel userId={user?.uid} />
     </div>
   );
 }

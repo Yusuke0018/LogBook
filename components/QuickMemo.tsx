@@ -16,9 +16,18 @@ import { uploadImage } from '@/lib/services/storage';
 
 const MAX_LENGTH = 140;
 
+// 気分スコア（1-5）の絵文字マップ
+const MOOD_OPTIONS = [
+  { value: 1, emoji: '😢', label: 'とても悪い' },
+  { value: 2, emoji: '😕', label: '悪い' },
+  { value: 3, emoji: '😐', label: 'ふつう' },
+  { value: 4, emoji: '🙂', label: '良い' },
+  { value: 5, emoji: '😄', label: 'とても良い' },
+];
+
 interface QuickMemoProps {
   memos: Memo[];
-  onSubmit: (content: string, imageUrl?: string) => Promise<void>;
+  onSubmit: (content: string, mood?: number, imageUrl?: string) => Promise<void>;
   onDelete: (memoId: string) => Promise<void>;
   userId?: string;
 }
@@ -31,6 +40,7 @@ export default function QuickMemo({
 }: QuickMemoProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [content, setContent] = useState('');
+  const [mood, setMood] = useState<number | undefined>(undefined);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -79,8 +89,9 @@ export default function QuickMemo({
         imageUrl = await uploadImage(userId, imageFile);
       }
 
-      await onSubmit(content.trim(), imageUrl);
+      await onSubmit(content.trim(), mood, imageUrl);
       setContent('');
+      setMood(undefined);
       setImageFile(null);
       setImagePreview(null);
       if (fileInputRef.current) {
@@ -104,6 +115,7 @@ export default function QuickMemo({
   const handleClose = () => {
     setIsOpen(false);
     setContent('');
+    setMood(undefined);
     setImageFile(null);
     setImagePreview(null);
     if (fileInputRef.current) {
@@ -182,6 +194,33 @@ export default function QuickMemo({
                         className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border-0 rounded-xl text-gray-900 dark:text-white placeholder:text-gray-400 focus:ring-2 focus:ring-primary-500 resize-none text-base"
                         placeholder="今思ったことをメモ..."
                       />
+
+                      {/* 気分セレクター（1-5） */}
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-gray-500 dark:text-gray-400">気分</span>
+                        <div className="flex gap-1">
+                          {MOOD_OPTIONS.map((option) => (
+                            <button
+                              key={option.value}
+                              type="button"
+                              onClick={() => setMood(mood === option.value ? undefined : option.value)}
+                              className={`p-2 text-xl rounded-lg transition-all ${
+                                mood === option.value
+                                  ? 'bg-primary-100 dark:bg-primary-900/50 ring-2 ring-primary-500 scale-110'
+                                  : 'hover:bg-gray-100 dark:hover:bg-gray-700 opacity-50 hover:opacity-100'
+                              }`}
+                              title={option.label}
+                            >
+                              {option.emoji}
+                            </button>
+                          ))}
+                        </div>
+                        {mood && (
+                          <span className="text-xs text-gray-500 dark:text-gray-400 ml-1">
+                            {MOOD_OPTIONS.find(o => o.value === mood)?.label}
+                          </span>
+                        )}
+                      </div>
 
                       {/* 画像プレビュー */}
                       {imagePreview && (
@@ -266,9 +305,16 @@ export default function QuickMemo({
                               />
                             )}
                             <div className="flex-1 min-w-0">
-                              <p className="text-sm text-gray-700 dark:text-gray-200 break-words">
-                                {memo.content}
-                              </p>
+                              <div className="flex items-center gap-2">
+                                {memo.mood && (
+                                  <span className="text-base">
+                                    {MOOD_OPTIONS.find(o => o.value === memo.mood)?.emoji}
+                                  </span>
+                                )}
+                                <p className="text-sm text-gray-700 dark:text-gray-200 break-words">
+                                  {memo.content}
+                                </p>
+                              </div>
                               <p className="text-xs text-gray-400 mt-1">
                                 {format(memo.createdAt.toDate(), 'HH:mm', {
                                   locale: ja,
