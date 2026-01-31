@@ -4,7 +4,6 @@ import { format } from 'date-fns';
 import { ja } from 'date-fns/locale';
 import { PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
 import type { Entry, Memo } from '@/lib/types';
-import { MOOD_EMOJI_MAP, MOOD_LABEL_MAP } from '@/lib/constants/entry';
 
 export type UnifiedItem =
   | { type: 'entry'; data: Entry }
@@ -129,33 +128,18 @@ function EntryCard({
         </div>
       )}
 
-      <div className="flex flex-wrap gap-2 items-center">
-        {typeof entry.mood === 'number' && (
-          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-accent-100 text-accent-800 dark:bg-accent-900/30 dark:text-accent-200">
-            <span className="text-base mr-1" aria-hidden>
-              {MOOD_EMOJI_MAP[entry.mood] || '🙂'}
+      {entry.tags && entry.tags.length > 0 && (
+        <div className="flex flex-wrap gap-2 items-center">
+          {entry.tags.map((tag, index) => (
+            <span
+              key={index}
+              className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-primary-100 text-primary-800 dark:bg-primary-900/30 dark:text-primary-200"
+            >
+              {tag}
             </span>
-            気分 {entry.mood} ({MOOD_LABEL_MAP[entry.mood] || '未設定'})
-          </span>
-        )}
-        {entry.tags && entry.tags.length > 0 && (
-          <div className="flex flex-wrap gap-1">
-            {entry.tags.map((tag, index) => (
-              <span
-                key={index}
-                className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-primary-100 text-primary-800 dark:bg-primary-900/30 dark:text-primary-200"
-              >
-                {tag}
-              </span>
-            ))}
-          </div>
-        )}
-        {entry.weather && (
-          <span className="text-sm text-gray-500 dark:text-gray-400">
-            🌤️ {entry.weather}
-          </span>
-        )}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

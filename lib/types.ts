@@ -12,8 +12,6 @@ export interface Entry {
   title?: string;
   content: string;
   tags?: string[];
-  weather?: string;
-  mood?: number | null;
   imageUrl?: string;
   createdAt: Timestamp;
   updatedAt: Timestamp;
@@ -45,8 +43,6 @@ export interface EntryFormData {
   title?: string;
   content: string;
   tags?: string[];
-  weather?: string;
-  mood?: number | null;
   imageUrl?: string;
   entryDate?: string; // YYYY-MM-DD形式、過去の日付のみ許可
 }
@@ -91,4 +87,39 @@ export interface WeeklyReviewFormData {
   stimulationScore: number;
   nextWeekTask: string;
   freeMemo?: string;
+}
+
+// 健康ログ（1日1回）
+export interface HealthLog {
+  id: string;
+  userId: string;
+  date: string; // YYYY-MM-DD形式（その日を一意に識別）
+  sleepDuration: number; // 睡眠時間（分単位）
+  hrv: number; // 心拍変動（HRV）
+  minHeartRate: number; // 睡眠時最低心拍数
+  steps: number; // 歩数
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+
+export interface HealthLogFormData {
+  date: string; // YYYY-MM-DD形式
+  sleepDuration: number; // 睡眠時間（分単位）
+  hrv: number;
+  minHeartRate: number;
+  steps: number;
+}
+
+// 気分ログ（1日何回でも記録可能）
+export interface MoodLog {
+  id: string;
+  userId: string;
+  score: number; // 気分スコア（0-10）
+  note?: string; // メモ（任意）
+  createdAt: Timestamp;
+}
+
+export interface MoodLogFormData {
+  score: number;
+  note?: string;
 }

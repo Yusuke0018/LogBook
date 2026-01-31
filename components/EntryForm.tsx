@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { PaperAirplaneIcon, PhotoIcon, XMarkIcon, CalendarIcon } from '@heroicons/react/24/solid';
 import type { EntryFormData } from '@/lib/types';
-import { MOOD_SCALE } from '@/lib/constants/entry';
 import { uploadImage } from '@/lib/services/storage';
 import { format } from 'date-fns';
 
@@ -29,8 +28,6 @@ export default function EntryForm({
 }: EntryFormProps) {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
-  const [weather, setWeather] = useState('');
-  const [mood, setMood] = useState<number | null>(null);
   const [entryDate, setEntryDate] = useState(getTodayString());
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -43,10 +40,6 @@ export default function EntryForm({
     if (initialData) {
       setTitle(initialData.title || '');
       setContent(initialData.content || '');
-      setWeather(initialData.weather || '');
-      setMood(
-        typeof initialData.mood === 'number' ? initialData.mood : null
-      );
       setExistingImageUrl(initialData.imageUrl || null);
       setImageFile(null);
       setImagePreview(null);
@@ -57,8 +50,6 @@ export default function EntryForm({
     } else {
       setTitle('');
       setContent('');
-      setWeather('');
-      setMood(null);
       setEntryDate(getTodayString());
       setExistingImageUrl(null);
       setImageFile(null);
@@ -88,10 +79,6 @@ export default function EntryForm({
     }
   };
 
-  const handleMoodSelect = (value: number) => {
-    setMood((prev) => (prev === value ? null : value));
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!content.trim()) return;
@@ -108,8 +95,6 @@ export default function EntryForm({
       const data: EntryFormData = {
         title: title.trim() || undefined,
         content: content.trim(),
-        weather: weather.trim() || undefined,
-        mood,
         imageUrl,
         entryDate,
       };
@@ -120,8 +105,6 @@ export default function EntryForm({
       if (!initialData) {
         setTitle('');
         setContent('');
-        setWeather('');
-        setMood(null);
         setEntryDate(getTodayString());
         setImageFile(null);
         setImagePreview(null);
@@ -237,66 +220,6 @@ export default function EntryForm({
               </button>
             </div>
           )}
-        </div>
-      </div>
-
-      <div className="space-y-2">
-        <label
-          htmlFor="weather"
-          className="block text-sm font-semibold text-gray-700 dark:text-gray-300"
-        >
-          天気
-        </label>
-        <input
-          type="text"
-          id="weather"
-          value={weather}
-          onChange={(e) => setWeather(e.target.value)}
-          className="w-full px-4 py-3 bg-white/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:text-white transition-all placeholder:text-gray-400"
-          placeholder="☀️ 晴れ / ☁️ 曇り / 🌧️ 雨"
-        />
-      </div>
-
-      <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-            気分スコア<span className="text-gray-400 font-normal ml-1">(1-5)</span>
-          </label>
-          {mood !== null && (
-            <button
-              type="button"
-              onClick={() => setMood(null)}
-              className="text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-            >
-              クリア
-            </button>
-          )}
-        </div>
-        <div className="flex flex-wrap gap-2">
-          {MOOD_SCALE.map((option) => {
-            const isActive = mood === option.value;
-            return (
-              <button
-                type="button"
-                key={option.value}
-                onClick={() => handleMoodSelect(option.value)}
-                aria-pressed={isActive}
-                className={`flex items-center gap-2 px-3 py-2 rounded-xl border transition-all ${
-                  isActive
-                    ? 'border-primary-500 bg-primary-50 text-primary-600 dark:bg-primary-900/30 dark:border-primary-400 dark:text-primary-200'
-                    : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:border-primary-300 dark:hover:border-primary-600'
-                }`}
-              >
-                <span className="text-lg" aria-hidden>
-                  {option.emoji}
-                </span>
-                <span className="text-sm font-medium">{option.value}</span>
-                <span className="text-xs text-gray-500 dark:text-gray-400">
-                  {option.label}
-                </span>
-              </button>
-            );
-          })}
         </div>
       </div>
 

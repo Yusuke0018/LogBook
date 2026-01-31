@@ -55,8 +55,10 @@ import {
   CalendarDaysIcon,
   ArrowRightOnRectangleIcon,
   EnvelopeIcon,
+  HeartIcon,
 } from '@heroicons/react/24/outline';
 import ThemeToggle from '@/components/ThemeToggle';
+import MoodLogPanel from '@/components/MoodLogPanel';
 import type { Entry, EntryFormData, Memo } from '@/lib/types';
 
 type TrendPeriod = '7' | '30';
@@ -133,35 +135,19 @@ const collectTopItems = (
 };
 
 const createSummary = (title: string, entries: Entry[]): SummaryData => {
-  const moodValues = entries
-    .map((entry) => entry.mood)
-    .filter((value): value is number => typeof value === 'number');
-
-  const averageMood = moodValues.length
-    ? Number(
-        (
-          moodValues.reduce((sum, value) => sum + value, 0) /
-          moodValues.length
-        ).toFixed(1)
-      )
-    : null;
-
   const tagValues = entries.flatMap((entry) => entry.tags || []);
-  const weatherValues = entries
-    .map((entry) => entry.weather)
-    .filter((value): value is string => Boolean(value && value.trim()));
 
   return {
     title,
     entryCount: entries.length,
-    averageMood,
+    averageMood: null,
     topTags: collectTopItems(tagValues),
-    topWeather: collectTopItems(weatherValues, 3),
+    topWeather: [],
   };
 };
 
 const buildMoodTrend = (
-  entries: Entry[],
+  _entries: Entry[],
   referenceDate: Date,
   period: number
 ): MoodTrendPoint[] => {
@@ -169,30 +155,12 @@ const buildMoodTrend = (
 
   for (let i = period - 1; i >= 0; i -= 1) {
     const dayStart = startOfDay(addDays(referenceDate, -i));
-    const dayEnd = endOfDay(dayStart);
-    const dailyEntries = entries.filter((entry) => {
-      const date = entry.createdAt.toDate();
-      return date >= dayStart && date <= dayEnd;
-    });
-
-    const moodValues = dailyEntries
-      .map((entry) => entry.mood)
-      .filter((value): value is number => typeof value === 'number');
-
-    const averageMood = moodValues.length
-      ? Number(
-          (
-            moodValues.reduce((sum, value) => sum + value, 0) /
-            moodValues.length
-          ).toFixed(2)
-        )
-      : null;
 
     data.push({
       dateLabel: format(dayStart, period > 7 ? 'MM/dd' : 'MM/dd', {
         locale: ja,
       }),
-      averageMood,
+      averageMood: null,
     });
   }
 
@@ -546,6 +514,13 @@ export default function DashboardPage() {
             </div>
             <div className="flex items-center gap-1 sm:gap-2">
               <Link
+                href="/health"
+                className="header-btn inline-flex items-center gap-1 sm:gap-2 text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-all !px-2 sm:!px-4"
+              >
+                <HeartIcon className="h-4 w-4 sm:h-5 sm:w-5" />
+                <span className="hidden sm:inline">健康</span>
+              </Link>
+              <Link
                 href="/future-letter"
                 className="header-btn relative inline-flex items-center gap-1 sm:gap-2 text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-all !px-2 sm:!px-4"
               >
@@ -785,6 +760,8 @@ export default function DashboardPage() {
         onDelete={handleDeleteMemo}
         userId={user?.uid}
       />
+
+      <MoodLogPanel userId={user?.uid} />
     </div>
   );
 }

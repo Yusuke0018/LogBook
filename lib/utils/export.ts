@@ -1,6 +1,6 @@
 import { format } from 'date-fns';
 import { ja } from 'date-fns/locale';
-import type { Entry, Memo } from '@/lib/types';
+import type { Entry, Memo, HealthLog, MoodLog } from '@/lib/types';
 
 export function entriesToText(entries: Entry[]): string {
   return entries
@@ -8,30 +8,20 @@ export function entriesToText(entries: Entry[]): string {
       const date = entry.createdAt.toDate();
       const time = format(date, 'HH:mm', { locale: ja });
       const title = entry.title ? `【${entry.title}】` : '';
-      const moodText =
-        typeof entry.mood === 'number' ? `気分 ${entry.mood}` : '';
-      const weatherText = entry.weather ? `天気 ${entry.weather}` : '';
-      const meta = [moodText, weatherText]
-        .filter(Boolean)
-        .join(' / ');
-
-      const metaLine = meta ? `\n${meta}` : '';
-      return `${time} ${title}\n${entry.content}${metaLine}`;
+      return `${time} ${title}\n${entry.content}`;
     })
     .join('\n\n---\n\n');
 }
 
 export function entriesToCSV(entries: Entry[]): string {
-  const headers = ['日時', 'タイトル', '本文', 'タグ', '天気', '気分スコア'];
+  const headers = ['日時', 'タイトル', '本文', 'タグ'];
   const rows = entries.map((entry) => {
     const date = entry.createdAt.toDate();
     const dateStr = format(date, 'yyyy-MM-dd HH:mm:ss', { locale: ja });
     const title = entry.title || '';
     const content = `"${entry.content.replace(/"/g, '""')}"`;
     const tags = entry.tags?.join(';') || '';
-    const weather = entry.weather || '';
-    const mood = typeof entry.mood === 'number' ? entry.mood.toString() : '';
-    return [dateStr, title, content, tags, weather, mood].join(',');
+    return [dateStr, title, content, tags].join(',');
   });
 
   return [headers.join(','), ...rows].join('\n');
@@ -84,7 +74,7 @@ export function memosToText(memos: Memo[]): string {
 }
 
 export function unifiedToCSV(entries: Entry[], memos: Memo[]): string {
-  const headers = ['種類', '日時', 'タイトル', '本文', 'タグ', '天気', '気分スコア', '画像URL'];
+  const headers = ['種類', '日時', 'タイトル', '本文', 'タグ', '画像URL'];
 
   const entryRows = entries.map((entry) => {
     const date = entry.createdAt.toDate();
@@ -92,10 +82,8 @@ export function unifiedToCSV(entries: Entry[], memos: Memo[]): string {
     const title = entry.title || '';
     const content = `"${entry.content.replace(/"/g, '""')}"`;
     const tags = entry.tags?.join(';') || '';
-    const weather = entry.weather || '';
-    const mood = typeof entry.mood === 'number' ? entry.mood.toString() : '';
     const imageUrl = entry.imageUrl || '';
-    return ['投稿', dateStr, title, content, tags, weather, mood, imageUrl].join(',');
+    return ['投稿', dateStr, title, content, tags, imageUrl].join(',');
   });
 
   const memoRows = memos.map((memo) => {
@@ -103,7 +91,7 @@ export function unifiedToCSV(entries: Entry[], memos: Memo[]): string {
     const dateStr = format(date, 'yyyy-MM-dd HH:mm:ss', { locale: ja });
     const content = `"${memo.content.replace(/"/g, '""')}"`;
     const imageUrl = memo.imageUrl || '';
-    return ['断片', dateStr, '', content, '', '', '', imageUrl].join(',');
+    return ['断片', dateStr, '', content, '', imageUrl].join(',');
   });
 
   const allRows = [...entryRows, ...memoRows].sort((a, b) => {
@@ -113,4 +101,37 @@ export function unifiedToCSV(entries: Entry[], memos: Memo[]): string {
   });
 
   return [headers.join(','), ...allRows].join('\n');
+}
+
+// 健康ログをCSV形式に変換
+export function healthLogsToCSV(logs: HealthLog[]): string {
+  const headers = ['日付', '睡眠時間(分)', '睡眠時間(時間)', 'HRV(ms)', '最低心拍数(bpm)', '歩数'];
+
+  const rows = logs.map((log) => {
+    const sleepHours = (log.sleepDuration / 60).toFixed(1);
+    return [
+      log.date,
+      log.sleepDuration.toString(),
+      sleepHours,
+      log.hrv.toString(),
+      log.minHeartRate.toString(),
+      log.steps.toString(),
+    ].join(',');
+  });
+
+  return [headers.join(','), ...rows].join('\n');
+}
+
+// 気分ログをCSV形式に変換
+export function moodLogsToCSV(logs: MoodLog[]): string {
+  const headers = ['日時', '気分スコア', 'メモ'];
+
+  const rows = logs.map((log) => {
+    const date = log.createdAt.toDate();
+    const dateStr = format(date, 'yyyy-MM-dd HH:mm:ss', { locale: ja });
+    const note = log.note ? `"${log.note.replace(/"/g, '""')}"` : '';
+    return [dateStr, log.score.toString(), note].join(',');
+  });
+
+  return [headers.join(','), ...rows].join('\n');
 }

@@ -105,5 +105,48 @@ service cloud.firestore {
       allow delete: if isAuthenticated() &&
         resource.data.userId == request.auth.uid;
     }
+
+    // healthLogsコレクション（健康ログ - 1日1回）
+    match /healthLogs/{logId} {
+      allow read: if isAuthenticated() &&
+        resource.data.userId == request.auth.uid;
+
+      allow create: if isAuthenticated() &&
+        request.resource.data.userId == request.auth.uid &&
+        request.resource.data.date is string &&
+        request.resource.data.sleepDuration is number &&
+        request.resource.data.sleepDuration >= 0 &&
+        request.resource.data.hrv is number &&
+        request.resource.data.hrv >= 0 &&
+        request.resource.data.minHeartRate is number &&
+        request.resource.data.minHeartRate >= 0 &&
+        request.resource.data.steps is number &&
+        request.resource.data.steps >= 0 &&
+        request.resource.data.createdAt is timestamp &&
+        request.resource.data.updatedAt is timestamp;
+
+      allow update: if isAuthenticated() &&
+        resource.data.userId == request.auth.uid &&
+        request.resource.data.userId == request.auth.uid;
+
+      allow delete: if isAuthenticated() &&
+        resource.data.userId == request.auth.uid;
+    }
+
+    // moodLogsコレクション（気分ログ - 1日何回でも記録可能）
+    match /moodLogs/{logId} {
+      allow read: if isAuthenticated() &&
+        resource.data.userId == request.auth.uid;
+
+      allow create: if isAuthenticated() &&
+        request.resource.data.userId == request.auth.uid &&
+        request.resource.data.score is number &&
+        request.resource.data.score >= 0 &&
+        request.resource.data.score <= 10 &&
+        request.resource.data.createdAt is timestamp;
+
+      allow delete: if isAuthenticated() &&
+        resource.data.userId == request.auth.uid;
+    }
   }
 }

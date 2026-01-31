@@ -6,7 +6,6 @@ import { format, isSameDay, startOfDay } from 'date-fns';
 import { ja } from 'date-fns/locale';
 import { CalendarDaysIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import type { Entry } from '@/lib/types';
-import { MOOD_EMOJI_MAP } from '@/lib/constants/entry';
 
 type RangeOption = 1 | 3 | 5;
 
@@ -324,11 +323,6 @@ export default function TimelineView({ entries, className }: TimelineViewProps) 
                                                   <span className="font-medium text-gray-900 dark:text-white truncate">
                                                     {entry.title || '無題'}
                                                   </span>
-                                                  {typeof entry.mood === 'number' && (
-                                                    <span className="flex-shrink-0">
-                                                      {MOOD_EMOJI_MAP[entry.mood] || '🙂'}
-                                                    </span>
-                                                  )}
                                                 </div>
                                                 <p className="text-gray-500 dark:text-gray-400 line-clamp-2 mt-0.5">
                                                   {buildSnippet(entry.content, 50)}

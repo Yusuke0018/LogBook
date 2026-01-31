@@ -41,8 +41,6 @@ export async function createEntry(
     title: data.title || '',
     content: data.content,
     tags: data.tags || [],
-    weather: data.weather || '',
-    mood: data.mood ?? null,
     imageUrl: data.imageUrl || '',
     createdAt,
     updatedAt: now,
@@ -75,12 +73,6 @@ export async function updateEntry(
   }
   if (data.tags !== undefined) {
     updateData.tags = data.tags;
-  }
-  if (data.weather !== undefined) {
-    updateData.weather = data.weather;
-  }
-  if (data.mood !== undefined) {
-    updateData.mood = data.mood;
   }
   if (data.imageUrl !== undefined) {
     updateData.imageUrl = data.imageUrl;
@@ -174,7 +166,6 @@ export function entryMatchesSearchTerm(entry: Entry, searchTerm: string) {
   const targets: string[] = [
     entry.content,
     entry.title || '',
-    entry.weather || '',
   ];
 
   if (entry.tags) {
