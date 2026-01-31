@@ -16,14 +16,8 @@ import { uploadImage } from '@/lib/services/storage';
 
 const MAX_LENGTH = 140;
 
-// 気分スコア（1-5）の絵文字マップ
-const MOOD_OPTIONS = [
-  { value: 1, emoji: '😢', label: 'とても悪い' },
-  { value: 2, emoji: '😕', label: '悪い' },
-  { value: 3, emoji: '😐', label: 'ふつう' },
-  { value: 4, emoji: '🙂', label: '良い' },
-  { value: 5, emoji: '😄', label: 'とても良い' },
-];
+// 気分スコア（1-5）
+const MOOD_OPTIONS = [1, 2, 3, 4, 5];
 
 interface QuickMemoProps {
   memos: Memo[];
@@ -199,27 +193,21 @@ export default function QuickMemo({
                       <div className="flex items-center gap-2">
                         <span className="text-xs text-gray-500 dark:text-gray-400">気分</span>
                         <div className="flex gap-1">
-                          {MOOD_OPTIONS.map((option) => (
+                          {MOOD_OPTIONS.map((value) => (
                             <button
-                              key={option.value}
+                              key={value}
                               type="button"
-                              onClick={() => setMood(mood === option.value ? undefined : option.value)}
-                              className={`p-2 text-xl rounded-lg transition-all ${
-                                mood === option.value
-                                  ? 'bg-primary-100 dark:bg-primary-900/50 ring-2 ring-primary-500 scale-110'
-                                  : 'hover:bg-gray-100 dark:hover:bg-gray-700 opacity-50 hover:opacity-100'
+                              onClick={() => setMood(mood === value ? undefined : value)}
+                              className={`w-8 h-8 text-sm font-medium rounded-lg transition-all ${
+                                mood === value
+                                  ? 'bg-primary-500 text-white ring-2 ring-primary-300'
+                                  : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                               }`}
-                              title={option.label}
                             >
-                              {option.emoji}
+                              {value}
                             </button>
                           ))}
                         </div>
-                        {mood && (
-                          <span className="text-xs text-gray-500 dark:text-gray-400 ml-1">
-                            {MOOD_OPTIONS.find(o => o.value === mood)?.label}
-                          </span>
-                        )}
                       </div>
 
                       {/* 画像プレビュー */}
@@ -306,9 +294,9 @@ export default function QuickMemo({
                             )}
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-2">
-                                {memo.mood && (
-                                  <span className="text-base">
-                                    {MOOD_OPTIONS.find(o => o.value === memo.mood)?.emoji}
+                                {memo.mood !== undefined && (
+                                  <span className="inline-flex items-center justify-center w-5 h-5 text-xs font-medium bg-primary-100 dark:bg-primary-900/50 text-primary-700 dark:text-primary-300 rounded">
+                                    {memo.mood}
                                   </span>
                                 )}
                                 <p className="text-sm text-gray-700 dark:text-gray-200 break-words">

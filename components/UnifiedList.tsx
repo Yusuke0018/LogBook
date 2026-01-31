@@ -5,14 +5,6 @@ import { ja } from 'date-fns/locale';
 import { PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
 import type { Entry, Memo } from '@/lib/types';
 
-const MOOD_EMOJI: Record<number, string> = {
-  1: '😢',
-  2: '😕',
-  3: '😐',
-  4: '🙂',
-  5: '😄',
-};
-
 export type UnifiedItem =
   | { type: 'entry'; data: Entry }
   | { type: 'memo'; data: Memo };
@@ -173,8 +165,8 @@ function MemoCard({
               日々の断片
             </p>
             {memo.mood !== undefined && (
-              <span className="text-base" title={`気分: ${memo.mood}`}>
-                {MOOD_EMOJI[memo.mood]}
+              <span className="inline-flex items-center justify-center w-5 h-5 text-xs font-medium bg-primary-100 dark:bg-primary-900/50 text-primary-700 dark:text-primary-300 rounded" title={`気分: ${memo.mood}`}>
+                {memo.mood}
               </span>
             )}
           </div>

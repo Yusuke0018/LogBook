@@ -63,20 +63,12 @@ export function memosToCSV(memos: Memo[]): string {
   return [headers.join(','), ...rows].join('\n');
 }
 
-const MOOD_EMOJI: Record<number, string> = {
-  1: '😢',
-  2: '😕',
-  3: '😐',
-  4: '🙂',
-  5: '😄',
-};
-
 export function memosToText(memos: Memo[]): string {
   return memos
     .map((memo) => {
       const date = memo.createdAt.toDate();
       const dateStr = format(date, 'yyyy/MM/dd HH:mm', { locale: ja });
-      const moodText = memo.mood !== undefined ? ` ${MOOD_EMOJI[memo.mood] || ''}` : '';
+      const moodText = memo.mood !== undefined ? ` [気分:${memo.mood}]` : '';
       const imageText = memo.imageUrl ? ' [画像あり]' : '';
       return `${dateStr}${moodText}${imageText}\n${memo.content}`;
     })
