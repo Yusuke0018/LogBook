@@ -35,7 +35,13 @@ export default function DailyQuestion({ userId, onAnswerSubmitted }: DailyQuesti
       const today = getTodayDateString();
 
       // 今日の回答があるか確認
-      const existingAnswer = await getQuestionAnswerForDate(userId, today);
+      let existingAnswer = null;
+      try {
+        existingAnswer = await getQuestionAnswerForDate(userId, today);
+      } catch (e) {
+        console.warn('今日の回答取得スキップ（インデックス未作成の可能性）:', e);
+      }
+
       if (existingAnswer) {
         setTodaysAnswer(existingAnswer);
         setShowQuestion(true);
@@ -44,13 +50,24 @@ export default function DailyQuestion({ userId, onAnswerSubmitted }: DailyQuesti
       }
 
       // 回答済みIDを取得して今日の質問を選択
-      const answeredIds = await getAnsweredQuestionIds(userId);
+      let answeredIds: number[] = [];
+      try {
+        answeredIds = await getAnsweredQuestionIds(userId);
+      } catch (e) {
+        console.warn('回答済みID取得スキップ:', e);
+      }
+
       setAnsweredCount(answeredIds.length);
       const todaysQuestion = selectTodaysQuestion(answeredIds, today);
       setQuestion(todaysQuestion);
       setShowQuestion(isQuestionTime());
     } catch (error) {
       console.error('質問読み込みエラー:', error);
+      // エラー時でも21時以降なら質問を表示する
+      const today = getTodayDateString();
+      const todaysQuestion = selectTodaysQuestion([], today);
+      setQuestion(todaysQuestion);
+      setShowQuestion(isQuestionTime());
     } finally {
       setLoading(false);
     }
@@ -84,8 +101,17 @@ export default function DailyQuestion({ userId, onAnswerSubmitted }: DailyQuesti
       });
 
       // 回答済みに切り替え
-      const saved = await getQuestionAnswerForDate(userId, getTodayDateString());
-      setTodaysAnswer(saved);
+      setTodaysAnswer({
+        id: '',
+        userId,
+        questionId: question.id,
+        questionText: question.text,
+        questionCategoryName: question.categoryName,
+        questionDepth: question.depth,
+        answer: answer.trim(),
+        date: getTodayDateString(),
+        createdAt: { toDate: () => new Date() } as QuestionAnswer['createdAt'],
+      });
       setAnswer('');
       onAnswerSubmitted?.();
     } catch (error) {
