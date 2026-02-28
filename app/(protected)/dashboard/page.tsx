@@ -17,6 +17,7 @@ import {
   getMemosByUser,
 } from '@/lib/services/memos';
 import { getUnreadLettersCount } from '@/lib/services/futureLetters';
+import { getQuestionAnswersByUser } from '@/lib/services/questionAnswers';
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic';
@@ -58,7 +59,8 @@ import {
   HeartIcon,
 } from '@heroicons/react/24/outline';
 import ThemeToggle from '@/components/ThemeToggle';
-import type { Entry, EntryFormData, Memo } from '@/lib/types';
+import DailyQuestion from '@/components/DailyQuestion';
+import type { Entry, EntryFormData, Memo, QuestionAnswer } from '@/lib/types';
 
 type TrendPeriod = '7' | '30';
 
@@ -182,6 +184,7 @@ export default function DashboardPage() {
   const [memos, setMemos] = useState<Memo[]>([]);
   const [highlightedEntryId, setHighlightedEntryId] = useState<string | null>(null);
   const [unreadLettersCount, setUnreadLettersCount] = useState(0);
+  const [questionAnswers, setQuestionAnswers] = useState<QuestionAnswer[]>([]);
 
   // Handle URL parameters from timeline
   useEffect(() => {
@@ -216,6 +219,7 @@ export default function DashboardPage() {
       loadEntries();
       loadMemos();
       loadUnreadLettersCount();
+      loadQuestionAnswers();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
@@ -248,6 +252,16 @@ export default function DashboardPage() {
       setUnreadLettersCount(count);
     } catch (error) {
       console.error('未読手紙数取得エラー:', error);
+    }
+  };
+
+  const loadQuestionAnswers = async () => {
+    if (!user) return;
+    try {
+      const data = await getQuestionAnswersByUser(user.uid);
+      setQuestionAnswers(data);
+    } catch (error) {
+      console.error('質問回答読み込みエラー:', error);
     }
   };
 
@@ -380,17 +394,50 @@ export default function DashboardPage() {
     });
   }, [memos, selectedDate, filters]);
 
+  const filteredQuestionAnswers = useMemo(() => {
+    return questionAnswers.filter((qa) => {
+      const qaDate = qa.createdAt.toDate();
+
+      if (selectedDate && !isSameDay(qaDate, selectedDate)) {
+        return false;
+      }
+
+      if (filters.startDate) {
+        const start = startOfDay(new Date(filters.startDate));
+        if (qaDate < start) return false;
+      }
+
+      if (filters.endDate) {
+        const end = endOfDay(new Date(filters.endDate));
+        if (qaDate > end) return false;
+      }
+
+      if (filters.searchTerm.trim()) {
+        const term = filters.searchTerm.toLowerCase();
+        if (
+          !qa.questionText.toLowerCase().includes(term) &&
+          !qa.answer.toLowerCase().includes(term)
+        ) {
+          return false;
+        }
+      }
+
+      return true;
+    });
+  }, [questionAnswers, selectedDate, filters]);
+
   const unifiedItems: UnifiedItem[] = useMemo(() => {
     const items: UnifiedItem[] = [
       ...filteredEntries.map((entry) => ({ type: 'entry' as const, data: entry })),
       ...filteredMemos.map((memo) => ({ type: 'memo' as const, data: memo })),
+      ...filteredQuestionAnswers.map((qa) => ({ type: 'questionAnswer' as const, data: qa })),
     ];
     return items.sort((a, b) => {
       const dateA = a.data.createdAt.toDate().getTime();
       const dateB = b.data.createdAt.toDate().getTime();
       return dateB - dateA;
     });
-  }, [filteredEntries, filteredMemos]);
+  }, [filteredEntries, filteredMemos, filteredQuestionAnswers]);
 
   const filtersActive =
     Boolean(filters.searchTerm.trim()) ||
@@ -559,6 +606,14 @@ export default function DashboardPage() {
           <div className="lg:col-span-2 space-y-8">
             {/* Weekly Review Prompt */}
             {user && <WeeklyReviewPrompt userId={user.uid} />}
+
+            {/* Daily Question */}
+            {user && (
+              <DailyQuestion
+                userId={user.uid}
+                onAnswerSubmitted={loadQuestionAnswers}
+              />
+            )}
 
             {/* New Entry Card */}
             <div className="card p-8 animate-fade-in">

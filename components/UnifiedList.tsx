@@ -3,11 +3,12 @@
 import { format } from 'date-fns';
 import { ja } from 'date-fns/locale';
 import { PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
-import type { Entry, Memo } from '@/lib/types';
+import type { Entry, Memo, QuestionAnswer } from '@/lib/types';
 
 export type UnifiedItem =
   | { type: 'entry'; data: Entry }
-  | { type: 'memo'; data: Memo };
+  | { type: 'memo'; data: Memo }
+  | { type: 'questionAnswer'; data: QuestionAnswer };
 
 interface UnifiedListProps {
   items: UnifiedItem[];
@@ -45,12 +46,19 @@ export default function UnifiedList({
               isHighlighted={highlightedEntryId === item.data.id}
             />
           );
-        } else {
+        } else if (item.type === 'memo') {
           return (
             <MemoCard
               key={`memo-${item.data.id}`}
               memo={item.data}
               onDelete={onDeleteMemo}
+            />
+          );
+        } else {
+          return (
+            <QuestionAnswerCard
+              key={`qa-${item.data.id}`}
+              questionAnswer={item.data}
             />
           );
         }
@@ -197,6 +205,43 @@ function MemoCard({
             </svg>
           </button>
         )}
+      </div>
+    </div>
+  );
+}
+
+function QuestionAnswerCard({
+  questionAnswer,
+}: {
+  questionAnswer: QuestionAnswer;
+}) {
+  return (
+    <div className="group relative p-4 bg-violet-50/50 dark:bg-violet-900/10 border border-violet-200/50 dark:border-violet-800/30 rounded-xl hover:shadow-soft transition-all">
+      <div className="flex items-start gap-3">
+        <div className="p-1.5 bg-violet-100 dark:bg-violet-900/30 rounded-lg shrink-0">
+          <svg className="h-4 w-4 text-violet-600 dark:text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 mb-1">
+            <p className="text-xs text-violet-600 dark:text-violet-400 font-medium">
+              今日の問いかけ
+            </p>
+            <span className="text-[10px] text-gray-400 dark:text-gray-500">
+              {questionAnswer.questionCategoryName}
+            </span>
+          </div>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
+            {format(questionAnswer.createdAt.toDate(), 'yyyy年MM月dd日 HH:mm', { locale: ja })}
+          </p>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
+            Q. {questionAnswer.questionText}
+          </p>
+          <p className="text-sm text-gray-700 dark:text-gray-200 break-words">
+            A. {questionAnswer.answer}
+          </p>
+        </div>
       </div>
     </div>
   );

@@ -112,3 +112,33 @@ export interface HealthLogFormData {
   steps: number;
 }
 
+// 問いかけ型日記（Daily Question）
+export interface Question {
+  id: number;
+  text: string;
+  depth: number; // 1=軽い, 2=中程度, 3=深い
+  categoryId: string;
+  categoryName: string;
+}
+
+export interface QuestionAnswer {
+  id: string;
+  userId: string;
+  questionId: number;
+  questionText: string;
+  questionCategoryName: string;
+  questionDepth: number;
+  answer: string;
+  date: string; // YYYY-MM-DD
+  createdAt: Timestamp;
+}
+
+export interface QuestionAnswerFormData {
+  questionId: number;
+  questionText: string;
+  questionCategoryName: string;
+  questionDepth: number;
+  answer: string;
+  date: string; // YYYY-MM-DD
+}
+
