@@ -738,11 +738,11 @@ export default function DashboardPage() {
                     <p className="text-sm text-gray-600 dark:text-gray-400 mt-0.5">
                       {unifiedItems.length}件の記録
                       <span className="ml-1 text-gray-400 dark:text-gray-500">
-                        (投稿 {filteredEntries.length} / 断片 {filteredMemos.length})
+                        (投稿 {filteredEntries.length} / 断片 {filteredMemos.length} / 問いかけ {filteredQuestionAnswers.length})
                       </span>
                       {isFilteredView && (
                         <span className="ml-1 text-gray-400 dark:text-gray-500">
-                          / 全{entries.length + memos.length}件
+                          / 全{entries.length + memos.length + questionAnswers.length}件
                         </span>
                       )}
                     </p>
@@ -760,7 +760,7 @@ export default function DashboardPage() {
                   </button>
                   <button
                     onClick={() => {
-                      const csv = unifiedToCSV(filteredEntries, filteredMemos);
+                      const csv = unifiedToCSV(filteredEntries, filteredMemos, filteredQuestionAnswers);
                       const filename = `logbook_${format(new Date(), 'yyyyMMdd')}.csv`;
                       downloadCSV(csv, filename);
                       showToast('CSVをダウンロードしました');

@@ -1,6 +1,6 @@
 import { format } from 'date-fns';
 import { ja } from 'date-fns/locale';
-import type { Entry, Memo, HealthLog } from '@/lib/types';
+import type { Entry, Memo, HealthLog, QuestionAnswer } from '@/lib/types';
 
 export function entriesToText(entries: Entry[]): string {
   return entries
@@ -75,7 +75,7 @@ export function memosToText(memos: Memo[]): string {
     .join('\n\n---\n\n');
 }
 
-export function unifiedToCSV(entries: Entry[], memos: Memo[]): string {
+export function unifiedToCSV(entries: Entry[], memos: Memo[], questionAnswers: QuestionAnswer[] = []): string {
   const headers = ['種類', '日時', 'タイトル', '本文', 'タグ', '気分', '画像URL'];
 
   const entryRows = entries.map((entry) => {
@@ -97,7 +97,15 @@ export function unifiedToCSV(entries: Entry[], memos: Memo[]): string {
     return ['断片', dateStr, '', content, '', mood, imageUrl].join(',');
   });
 
-  const allRows = [...entryRows, ...memoRows].sort((a, b) => {
+  const qaRows = questionAnswers.map((qa) => {
+    const date = qa.createdAt.toDate();
+    const dateStr = format(date, 'yyyy-MM-dd HH:mm:ss', { locale: ja });
+    const content = `"Q. ${qa.questionText.replace(/"/g, '""')}\nA. ${qa.answer.replace(/"/g, '""')}"`;
+    const tags = qa.questionCategoryName;
+    return ['問いかけ', dateStr, '', content, tags, '', ''].join(',');
+  });
+
+  const allRows = [...entryRows, ...memoRows, ...qaRows].sort((a, b) => {
     const dateA = a.split(',')[1];
     const dateB = b.split(',')[1];
     return dateB.localeCompare(dateA);
