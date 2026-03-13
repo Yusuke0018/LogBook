@@ -20,12 +20,20 @@ export async function createLearning(
 ): Promise<string> {
   if (!db) throw new Error('Firestore is not initialized');
 
+  let createdAt = Timestamp.now();
+  if (data.date) {
+    const d = new Date(data.date);
+    const now = new Date();
+    d.setHours(now.getHours(), now.getMinutes(), now.getSeconds());
+    createdAt = Timestamp.fromDate(d);
+  }
+
   const docRef = await addDoc(collection(db, COLLECTION_NAME), {
     userId,
     content: data.content,
     tags: data.tags || [],
     source: data.source || '',
-    createdAt: Timestamp.now(),
+    createdAt,
   });
   return docRef.id;
 }

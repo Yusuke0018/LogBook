@@ -56,10 +56,10 @@ export default function DashboardPage() {
     }
   };
 
-  const handleCreate = async (content: string, tags: string[], source: string) => {
+  const handleCreate = async (content: string, tags: string[], source: string, date: string) => {
     if (!user) return;
     try {
-      await createLearning(user.uid, { content, tags, source });
+      await createLearning(user.uid, { content, tags, source, date: date || undefined });
       await loadLearnings();
       showToast('保存しました');
     } catch (error) {

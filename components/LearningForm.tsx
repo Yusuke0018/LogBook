@@ -4,13 +4,14 @@ import { useState } from 'react';
 import { PlusIcon } from '@heroicons/react/24/outline';
 
 interface LearningFormProps {
-  onSubmit: (content: string, tags: string[], source: string) => Promise<void>;
+  onSubmit: (content: string, tags: string[], source: string, date: string) => Promise<void>;
 }
 
 export default function LearningForm({ onSubmit }: LearningFormProps) {
   const [content, setContent] = useState('');
   const [tagInput, setTagInput] = useState('');
   const [source, setSource] = useState('');
+  const [date, setDate] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -23,10 +24,11 @@ export default function LearningForm({ onSubmit }: LearningFormProps) {
         .split(',')
         .map((t) => t.trim())
         .filter(Boolean);
-      await onSubmit(content.trim(), tags, source.trim());
+      await onSubmit(content.trim(), tags, source.trim(), date);
       setContent('');
       setTagInput('');
       setSource('');
+      setDate('');
     } finally {
       setSubmitting(false);
     }
@@ -41,7 +43,7 @@ export default function LearningForm({ onSubmit }: LearningFormProps) {
         rows={4}
         className="w-full px-4 py-3 bg-white/70 dark:bg-gray-800/70 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm resize-y"
       />
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <input
           type="text"
           value={tagInput}
@@ -54,6 +56,12 @@ export default function LearningForm({ onSubmit }: LearningFormProps) {
           value={source}
           onChange={(e) => setSource(e.target.value)}
           placeholder="出典（URL等、任意）"
+          className="px-4 py-2.5 bg-white/70 dark:bg-gray-800/70 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
+        />
+        <input
+          type="date"
+          value={date}
+          onChange={(e) => setDate(e.target.value)}
           className="px-4 py-2.5 bg-white/70 dark:bg-gray-800/70 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
         />
       </div>
