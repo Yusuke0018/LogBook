@@ -1,161 +1,24 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // ユーザーが認証されているかチェック
     function isAuthenticated() {
       return request.auth != null;
     }
 
-    // ユーザーが自分のドキュメントにアクセスしているかチェック
-    function isOwner(userId) {
-      return isAuthenticated() && request.auth.uid == userId;
+    // learningsコレクション（学びの蓄積）
+    match /learnings/{learningId} {
+      allow read, delete: if isAuthenticated() &&
+        resource.data.userId == request.auth.uid;
+
+      allow create: if isAuthenticated() &&
+        request.resource.data.userId == request.auth.uid &&
+        request.resource.data.content is string &&
+        request.resource.data.createdAt is timestamp;
     }
 
     // usersコレクション
     match /users/{userId} {
-      allow read, write: if isOwner(userId);
+      allow read, write: if isAuthenticated() && request.auth.uid == userId;
     }
-
-    // entriesコレクション
-    match /entries/{entryId} {
-      allow read, delete: if isAuthenticated() &&
-        resource.data.userId == request.auth.uid;
-
-      allow create: if isAuthenticated() &&
-        request.resource.data.userId == request.auth.uid &&
-        request.resource.data.content is string &&
-        request.resource.data.createdAt is timestamp &&
-        request.resource.data.updatedAt is timestamp;
-
-      allow update: if isAuthenticated() &&
-        resource.data.userId == request.auth.uid &&
-        request.resource.data.userId == request.auth.uid;
-    }
-
-    // entryExportsコレクション
-    match /entryExports/{exportId} {
-      allow read: if isAuthenticated() &&
-        resource.data.userId == request.auth.uid;
-
-      allow create: if isAuthenticated() &&
-        request.resource.data.userId == request.auth.uid &&
-        request.resource.data.rangeStart is timestamp &&
-        request.resource.data.rangeEnd is timestamp &&
-        request.resource.data.createdAt is timestamp;
-
-      allow update, delete: if isAuthenticated() &&
-        resource.data.userId == request.auth.uid;
-    }
-
-    // memosコレクション（140文字メモ + 気分）
-    match /memos/{memoId} {
-      allow read, delete: if isAuthenticated() &&
-        resource.data.userId == request.auth.uid;
-
-      allow create: if isAuthenticated() &&
-        request.resource.data.userId == request.auth.uid &&
-        request.resource.data.content is string &&
-        request.resource.data.content.size() <= 140 &&
-        request.resource.data.createdAt is timestamp &&
-        // mood is optional, but if present must be 1-5
-        (!('mood' in request.resource.data) ||
-          (request.resource.data.mood is number &&
-           request.resource.data.mood >= 1 &&
-           request.resource.data.mood <= 5));
-    }
-
-    // futureLettersコレクション（未来への手紙）
-    match /futureLetters/{letterId} {
-      allow read: if isAuthenticated() &&
-        resource.data.userId == request.auth.uid;
-
-      allow create: if isAuthenticated() &&
-        request.resource.data.userId == request.auth.uid &&
-        request.resource.data.title is string &&
-        request.resource.data.content is string &&
-        request.resource.data.period in ['short', 'medium', 'long', 'custom'] &&
-        request.resource.data.deliveryDate is timestamp &&
-        request.resource.data.createdAt is timestamp;
-
-      allow update: if isAuthenticated() &&
-        resource.data.userId == request.auth.uid &&
-        request.resource.data.userId == request.auth.uid;
-
-      allow delete: if isAuthenticated() &&
-        resource.data.userId == request.auth.uid;
-    }
-
-    // weeklyReviewsコレクション（週次振り返り）
-    match /weeklyReviews/{reviewId} {
-      allow read: if isAuthenticated() &&
-        resource.data.userId == request.auth.uid;
-
-      allow create: if isAuthenticated() &&
-        request.resource.data.userId == request.auth.uid &&
-        request.resource.data.weekStartDate is timestamp &&
-        request.resource.data.stabilityScore is number &&
-        request.resource.data.stabilityScore >= 0 &&
-        request.resource.data.stabilityScore <= 10 &&
-        request.resource.data.stimulationScore is number &&
-        request.resource.data.stimulationScore >= 0 &&
-        request.resource.data.stimulationScore <= 10 &&
-        request.resource.data.nextWeekTask is string &&
-        request.resource.data.createdAt is timestamp &&
-        request.resource.data.updatedAt is timestamp;
-
-      allow update: if isAuthenticated() &&
-        resource.data.userId == request.auth.uid &&
-        request.resource.data.userId == request.auth.uid;
-
-      allow delete: if isAuthenticated() &&
-        resource.data.userId == request.auth.uid;
-    }
-
-    // questionAnswersコレクション（問いかけ型日記）
-    match /questionAnswers/{answerId} {
-      allow read: if isAuthenticated() &&
-        resource.data.userId == request.auth.uid;
-
-      allow create: if isAuthenticated() &&
-        request.resource.data.userId == request.auth.uid &&
-        request.resource.data.questionId is number &&
-        request.resource.data.questionText is string &&
-        request.resource.data.questionCategoryName is string &&
-        request.resource.data.questionDepth is number &&
-        request.resource.data.answer is string &&
-        request.resource.data.date is string &&
-        request.resource.data.createdAt is timestamp;
-
-      allow delete: if isAuthenticated() &&
-        resource.data.userId == request.auth.uid;
-    }
-
-    // healthLogsコレクション（健康ログ - 1日1回）
-    match /healthLogs/{logId} {
-      allow read: if isAuthenticated() &&
-        resource.data.userId == request.auth.uid;
-
-      allow create: if isAuthenticated() &&
-        request.resource.data.userId == request.auth.uid &&
-        request.resource.data.date is string &&
-        request.resource.data.sleepDuration is number &&
-        request.resource.data.sleepDuration >= 0 &&
-        request.resource.data.hrv is number &&
-        request.resource.data.hrv >= 0 &&
-        request.resource.data.minHeartRate is number &&
-        request.resource.data.minHeartRate >= 0 &&
-        request.resource.data.steps is number &&
-        request.resource.data.steps >= 0 &&
-        request.resource.data.createdAt is timestamp &&
-        request.resource.data.updatedAt is timestamp;
-
-      allow update: if isAuthenticated() &&
-        resource.data.userId == request.auth.uid &&
-        request.resource.data.userId == request.auth.uid;
-
-      allow delete: if isAuthenticated() &&
-        resource.data.userId == request.auth.uid;
-    }
-
   }
 }
