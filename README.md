@@ -1,19 +1,18 @@
 # LogBook
 
-個人専用の日記ログアプリケーション
+学んだことをシンプルに蓄積するアプリ
 
 ## 機能
 
-- 日次ログ投稿（タイトル任意、本文必須、タグ/カテゴリ任意）
-- 一覧/詳細表示（当日分、過去分の確認・編集・削除）
-- カレンダー表示（月間カレンダーで投稿有無をハイライト）
-- クリップボードコピー（当日の全投稿をまとめてコピー）
-- CSV出力（任意期間を指定してダウンロード）
+- 学びの投稿（テキスト + タグ + 出典）
+- キーワード・タグ検索
+- クリップボードコピー / CSV出力
+- 二十四節気の背景テーマ
+- ダークモード
 
 ## 技術スタック
 
-- Next.js 14 (App Router)
-- TypeScript
+- Next.js (App Router) / React / TypeScript
 - Tailwind CSS
 - Firebase (Authentication & Firestore)
 - Vercel (デプロイ)
@@ -40,7 +39,3 @@ NEXT_PUBLIC_FIREBASE_APP_ID=
 ```bash
 npm run dev
 ```
-
-## デプロイ
-
-Vercelにデプロイする際は、環境変数を設定してください。

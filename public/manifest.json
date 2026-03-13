@@ -1,11 +1,11 @@
 {
-  "name": "LogBook - 日記アプリ",
+  "name": "LogBook - 学びの蓄積",
   "short_name": "LogBook",
-  "description": "あなたの日々を記録する、シンプルで美しい日記アプリ",
+  "description": "学んだことをシンプルに蓄積するアプリ",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0ea5e9",
-  "theme_color": "#0ea5e9",
+  "background_color": "#14b8a6",
+  "theme_color": "#14b8a6",
   "orientation": "portrait",
   "icons": [
     {

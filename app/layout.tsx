@@ -3,8 +3,8 @@ import './globals.css';
 import { ThemeProvider } from '@/lib/ThemeContext';
 
 export const metadata: Metadata = {
-  title: 'LogBook - 日記アプリ',
-  description: 'あなたの日々を記録する、シンプルで美しい日記アプリ',
+  title: 'LogBook - 学びの蓄積',
+  description: '学んだことをシンプルに蓄積するアプリ',
   applicationName: 'LogBook',
   appleWebApp: {
     capable: true,
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: '#0ea5e9',
+  themeColor: '#14b8a6',
   width: 'device-width',
   initialScale: 1,
   maximumScale: 1,
